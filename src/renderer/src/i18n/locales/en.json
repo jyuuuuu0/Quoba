@@ -19,5 +19,40 @@
   },
   "language": {
     "label": "Language"
+  },
+  "nav": {
+    "label": "Main",
+    "search": "Search",
+    "promises": "Promises",
+    "timeline": "Timeline",
+    "sources": "Sources",
+    "settings": "Settings"
+  },
+  "status": {
+    "upToDate": "Up to date",
+    "indexing": "Indexing…",
+    "indexingProgress": "Indexing {{processed}}/{{total}}",
+    "error": "Indexing failed",
+    "starting": "Starting…",
+    "indexedAt": "Indexed {{time}}"
+  },
+  "sources": {
+    "add": "Add a source",
+    "emptySidebar": "Connect your chats, mail and files"
+  },
+  "sourceNames": {
+    "kakaotalk": "KakaoTalk",
+    "discord": "Discord",
+    "slack": "Slack",
+    "telegram": "Telegram",
+    "whatsapp": "WhatsApp",
+    "mail": "Mail",
+    "notion": "Notion",
+    "obsidian": "Obsidian",
+    "github": "GitHub",
+    "files": "Files on this computer",
+    "rss": "RSS feeds",
+    "lark": "Lark",
+    "browser": "Browser history"
   }
 }
