@@ -1,9 +1,8 @@
 import { Search } from 'lucide-react'
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useShortcut } from '@/lib/shortcuts'
+import { useNavigation } from '@/stores/navigation'
 import { useSearch } from '@/stores/search'
-import { useSettings } from '@/stores/settings'
 
 export function SearchBar(): React.JSX.Element {
   const { t } = useTranslation()
@@ -11,13 +10,15 @@ export function SearchBar(): React.JSX.Element {
   const query = useSearch((state) => state.query)
   const setQuery = useSearch((state) => state.setQuery)
   const run = useSearch((state) => state.run)
-  const shortcut = useSettings((state) => state.settings?.shortcuts.search)
+  const searchFocus = useNavigation((state) => state.searchFocus)
 
   const focus = useCallback(() => {
     input.current?.focus()
     input.current?.select()
   }, [])
-  useShortcut(shortcut, focus)
+  useEffect(() => {
+    if (searchFocus > 0) focus()
+  }, [searchFocus, focus])
 
   return (
     <form

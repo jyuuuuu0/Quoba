@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AppShell } from '@/components/layout/AppShell'
+import { AppShortcuts } from '@/components/layout/AppShortcuts'
 import { Panel } from '@/components/layout/Panel'
 import { Spinner } from '@/components/ui/Spinner'
 import { screens } from '@/screens'
@@ -34,5 +35,10 @@ export function App(): React.JSX.Element {
   }
 
   const Screen = screens[route]
-  return <AppShell>{Screen ? <Screen /> : <EmptyScreen route={route} />}</AppShell>
+  return (
+    <AppShell>
+      <AppShortcuts />
+      {Screen ? <Screen /> : <EmptyScreen route={route} />}
+    </AppShell>
+  )
 }
