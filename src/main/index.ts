@@ -1,5 +1,11 @@
 import { join } from 'node:path'
 import { app, BrowserWindow, shell } from 'electron'
+import { EngineClient } from './engine'
+import { broadcast, registerIpc } from './ipc'
+import { Secrets } from './secrets'
+import { SettingsStore } from './settings-store'
+
+let mainWindow: BrowserWindow | undefined
 
 function createMainWindow(): BrowserWindow {
   const window = new BrowserWindow({
@@ -33,14 +39,39 @@ function createMainWindow(): BrowserWindow {
   } else {
     void window.loadFile(join(import.meta.dirname, '../renderer/index.html'))
   }
+  window.on('closed', () => {
+    if (mainWindow === window) mainWindow = undefined
+  })
   return window
 }
 
-app.whenReady().then(() => {
-  createMainWindow()
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
+app.whenReady().then(async () => {
+  const store = new SettingsStore()
+  const secrets = new Secrets()
+  const engine = new EngineClient({
+    onStatus: (status) => broadcast('engine:status', status),
+    onAnswer: (requestId, event) => broadcast('answer', { requestId, event })
   })
+
+  engine.start(secrets.env())
+  registerIpc({
+    store,
+    engine,
+    secrets,
+    onSettingsChanged: () => {
+      void engine.request('configure', { settings: store.get() })
+    }
+  })
+
+  mainWindow = createMainWindow()
+
+  await engine.request('configure', { settings: store.get() })
+  if (store.get().onboarded) void engine.request('refresh', {})
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) mainWindow = createMainWindow()
+  })
+  app.on('before-quit', () => engine.stop())
 })
 
 app.on('window-all-closed', () => {
