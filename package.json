@@ -22,7 +22,9 @@
     "format": "prettier --write .",
     "icons:brand": "node scripts/gen-brand-icons.mjs",
     "lint:i18n": "node scripts/check-locales.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "eval:generate": "node eval/generate.mjs",
+    "eval": "node eval/score.mts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
