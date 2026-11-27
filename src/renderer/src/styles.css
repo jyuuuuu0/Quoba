@@ -1,1 +1,90 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+
+/*
+ * Quoba design tokens.
+ * Mint is an accent, not a theme: use it only for citations, highlights,
+ * status dots and switched-on controls.
+ */
+@theme {
+  --font-sans: 'Inter Variable', 'Pretendard Variable', 'Pretendard JP Variable', system-ui, sans-serif;
+
+  --color-base: #050506;
+  --color-panel: #0e0e10;
+  --color-rail: #0b0b0d;
+  --color-field: #09090b;
+  --color-raised: #151518;
+  --color-hover: #17171a;
+  --color-line: #1e1e23;
+  --color-line-strong: #26262c;
+
+  --color-fg: #ececee;
+  --color-fg-muted: #a1a1aa;
+  --color-fg-subtle: #8a8a93;
+  --color-fg-faint: #3a3a42;
+
+  --color-mint: #33f5c1;
+  --color-mint-soft: rgb(51 245 193 / 0.12);
+  --color-mint-line: rgb(51 245 193 / 0.45);
+
+  --radius-control: 6px;
+  --radius-card: 10px;
+  --radius-panel: 12px;
+
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 14px;
+  --text-lg: 15px;
+  --text-xl: 18px;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-base);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.5;
+    letter-spacing: -0.005em;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  ::selection {
+    background: var(--color-mint-soft);
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--color-fg-faint);
+    outline-offset: 1px;
+  }
+
+  input,
+  textarea,
+  [data-selectable] {
+    user-select: text;
+  }
+}
+
+@utility drag {
+  -webkit-app-region: drag;
+}
+
+@utility no-drag {
+  -webkit-app-region: no-drag;
+}
+
+@utility scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
