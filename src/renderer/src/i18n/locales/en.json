@@ -180,5 +180,56 @@
     "label": "Topic",
     "placeholder": "A topic, e.g. presentation date",
     "empty": "Nothing dated found for this topic."
+  },
+  "settings": {
+    "sections": {
+      "general": "General",
+      "account": "Account & AI",
+      "shortcuts": "Keyboard shortcuts",
+      "privacy": "Privacy"
+    },
+    "general": {
+      "languageHelp": "Menus, labels and dates. Messages stay in their original language.",
+      "followSystem": "Follow system language",
+      "followSystemHelp": "Switch automatically when your computer's language changes.",
+      "launchAtLogin": "Launch at login",
+      "launchAtLoginHelp": "Keeps new messages indexed in the background.",
+      "names": "Your names in chats",
+      "namesHelp": "Add every name you appear as (nickname, real name, English name). Quoba uses them for “Said by me” and Promises.",
+      "namesPlaceholder": "Type a name and press Enter",
+      "removeName": "Remove {{name}}"
+    },
+    "account": {
+      "signedIn": "Signed in with Dazzi",
+      "signedOut": "Not signed in",
+      "signedInHelp": "AutoRAG's hosted models write your answers. No API key needed.",
+      "signedOutHelp": "Search works without signing in. Sign in for AI answers.",
+      "signOut": "Sign out",
+      "cli": "Shared with the AutoRAG CLI",
+      "cliHelp": "Signing in here also signs in the autorag command line, and the other way around."
+    },
+    "shortcuts": {
+      "global": "Open Quoba from anywhere",
+      "globalHelp": "Works even when Quoba is in the background.",
+      "actions": {
+        "search": "Search",
+        "goPromises": "Go to Promises",
+        "goTimeline": "Go to Timeline",
+        "goSources": "Go to Sources",
+        "toggleContext": "Toggle context panel",
+        "filterSaidByMe": "Filter: said by me"
+      },
+      "record": "Record shortcut",
+      "pressKeys": "Press keys…",
+      "change": "Change shortcut for {{action}}",
+      "taken": "Already used",
+      "help": "Click a shortcut and press new keys. Backspace clears it.",
+      "reset": "Reset to defaults"
+    },
+    "privacy": {
+      "local": "Your chats, mail and files are read and indexed on this computer. Quoba has no server and never uploads them.",
+      "ai": "When you get an AI answer, the few excerpts relevant to your question are sent to the AI model to write it. Search results alone never leave your computer.",
+      "tokens": "Access tokens are encrypted with your system keychain."
+    }
   }
 }

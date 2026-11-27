@@ -178,5 +178,56 @@
     "label": "トピック",
     "placeholder": "トピック、例: 発表日",
     "empty": "このトピックで日付のあるメッセージは見つかりませんでした。"
+  },
+  "settings": {
+    "sections": {
+      "general": "一般",
+      "account": "アカウントとAI",
+      "shortcuts": "キーボードショートカット",
+      "privacy": "プライバシー"
+    },
+    "general": {
+      "languageHelp": "メニュー、ボタン、日付に適用されます。メッセージは元の言語のまま表示されます。",
+      "followSystem": "システムの言語に従う",
+      "followSystemHelp": "コンピューターの言語が変わると自動で切り替えます。",
+      "launchAtLogin": "ログイン時に起動",
+      "launchAtLoginHelp": "新しいメッセージをバックグラウンドでインデックスし続けます。",
+      "names": "チャットで使っている自分の名前",
+      "namesHelp": "チャットに表示される名前をすべて追加してください（ニックネーム、本名、英語名）。「自分の発言」と約束に使います。",
+      "namesPlaceholder": "名前を入力してEnter",
+      "removeName": "{{name}}を削除"
+    },
+    "account": {
+      "signedIn": "Dazziでサインイン中",
+      "signedOut": "サインインしていません",
+      "signedInHelp": "AutoRAGのホスト型モデルが回答を作成します。APIキーは不要です。",
+      "signedOutHelp": "検索はサインインなしで使えます。AI回答にはサインインが必要です。",
+      "signOut": "サインアウト",
+      "cli": "AutoRAG CLIと共有",
+      "cliHelp": "ここでサインインすると autorag コマンドラインにもサインインされ、その逆も同様です。"
+    },
+    "shortcuts": {
+      "global": "どこからでもQuobaを開く",
+      "globalHelp": "Quobaがバックグラウンドにあっても動作します。",
+      "actions": {
+        "search": "検索",
+        "goPromises": "約束へ移動",
+        "goTimeline": "タイムラインへ移動",
+        "goSources": "ソースへ移動",
+        "toggleContext": "コンテキストパネルの表示切替",
+        "filterSaidByMe": "フィルタ: 自分の発言"
+      },
+      "record": "ショートカットを登録",
+      "pressKeys": "キーを押してください…",
+      "change": "{{action}}のショートカットを変更",
+      "taken": "使用中",
+      "help": "ショートカットをクリックして新しいキーを押してください。Backspaceで消去できます。",
+      "reset": "デフォルトに戻す"
+    },
+    "privacy": {
+      "local": "チャット、メール、ファイルはこのコンピューター上で読み込み、インデックスします。Quobaにはサーバーがなく、アップロードしません。",
+      "ai": "AI回答を受け取るときは、質問に関連する一部の文章だけをAIモデルに送って回答を作成します。検索結果だけなら何も外部に出ません。",
+      "tokens": "アクセストークンはシステムのキーチェーンで暗号化して保管します。"
+    }
   }
 }
