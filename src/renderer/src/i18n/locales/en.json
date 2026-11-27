@@ -38,7 +38,60 @@
   },
   "sources": {
     "add": "Add a source",
-    "emptySidebar": "Connect your chats, mail and files"
+    "emptySidebar": "Connect your chats, mail and files",
+    "intro": "Choose where Quoba looks. Everything is read and indexed on this computer.",
+    "checkAgain": "Check again",
+    "checking": "Checking sources",
+    "indexNow": "Index now",
+    "showMore": "Show more sources",
+    "privacy": "Chats, mail and files never leave this computer. Only when you ask for an AI answer are the few relevant excerpts sent to the AI model.",
+    "configure": "Set up",
+    "howToConnect": "How to connect",
+    "installHelp": "Quoba reads {{tool}}'s local archive. Install {{tool}}, sign in with it once, then press Check again.",
+    "toggle": "Search {{name}}",
+    "removeFolder": "Remove folder",
+    "chooseFolder": "Choose folder",
+    "state": {
+      "connected": "Connected",
+      "ready": "Ready to connect",
+      "needsTool": "Needs {{tool}}",
+      "error": "Can't connect"
+    },
+    "groups": {
+      "chat": "Chats",
+      "mail": "Mail",
+      "notes": "Notes",
+      "files": "Files",
+      "code": "Code",
+      "web": "Web"
+    },
+    "about": {
+      "kakaotalk": "Chat rooms on this computer",
+      "discord": "Servers and DMs from the Discord app",
+      "slack": "Workspaces and channels",
+      "telegram": "Chats and groups",
+      "whatsapp": "Chats from WhatsApp Desktop",
+      "mail": "Gmail, IMAP or saved .eml/.mbox mail",
+      "notion": "Pages in your workspace",
+      "obsidian": "A vault folder",
+      "github": "Issues, pull requests and comments",
+      "files": "Documents, PDFs, slides and HWP in chosen folders",
+      "rss": "Articles from feeds you follow",
+      "lark": "Lark chats and docs",
+      "browser": "Pages you visited (needs Hister)"
+    },
+    "github": {
+      "token": "GitHub access token",
+      "tokenPlaceholder": "Access token (kept in your system keychain)",
+      "repos": "Repositories"
+    },
+    "rss": {
+      "feeds": "Feed URLs, one per line"
+    },
+    "mail": {
+      "account": "Mail account",
+      "accountPlaceholder": "Account name set up in mailcrawl"
+    }
   },
   "sourceNames": {
     "kakaotalk": "KakaoTalk",

@@ -38,7 +38,60 @@
   },
   "sources": {
     "add": "소스 추가",
-    "emptySidebar": "대화, 메일, 파일을 연결하세요"
+    "emptySidebar": "대화, 메일, 파일을 연결하세요",
+    "intro": "Quoba가 찾아볼 곳을 고르세요. 모든 내용은 이 컴퓨터에서 읽고 색인해요.",
+    "checkAgain": "다시 확인",
+    "checking": "소스 확인 중",
+    "indexNow": "지금 색인",
+    "showMore": "소스 더 보기",
+    "privacy": "대화, 메일, 파일은 이 컴퓨터 밖으로 나가지 않아요. AI 답변을 요청할 때만 관련 있는 일부 문장이 AI 모델로 전송돼요.",
+    "configure": "설정",
+    "howToConnect": "연결 방법",
+    "installHelp": "Quoba는 {{tool}}이 저장한 대화 기록을 읽어요. {{tool}}을 설치하고 한 번 로그인한 뒤 다시 확인을 눌러 주세요.",
+    "toggle": "{{name}} 검색하기",
+    "removeFolder": "폴더 제거",
+    "chooseFolder": "폴더 선택",
+    "state": {
+      "connected": "연결됨",
+      "ready": "연결 가능",
+      "needsTool": "{{tool}} 필요",
+      "error": "연결할 수 없음"
+    },
+    "groups": {
+      "chat": "채팅",
+      "mail": "메일",
+      "notes": "노트",
+      "files": "파일",
+      "code": "코드",
+      "web": "웹"
+    },
+    "about": {
+      "kakaotalk": "이 컴퓨터의 채팅방",
+      "discord": "디스코드 앱의 서버와 DM",
+      "slack": "워크스페이스와 채널",
+      "telegram": "채팅과 그룹",
+      "whatsapp": "WhatsApp 데스크톱의 채팅",
+      "mail": "Gmail, IMAP 또는 저장된 .eml/.mbox 메일",
+      "notion": "워크스페이스의 페이지",
+      "obsidian": "볼트 폴더",
+      "github": "이슈, 풀 리퀘스트, 댓글",
+      "files": "선택한 폴더의 문서, PDF, 슬라이드, HWP",
+      "rss": "구독 중인 피드의 글",
+      "lark": "Lark 채팅과 문서",
+      "browser": "방문한 페이지 (Hister 필요)"
+    },
+    "github": {
+      "token": "GitHub 액세스 토큰",
+      "tokenPlaceholder": "액세스 토큰 (시스템 키체인에 보관)",
+      "repos": "저장소"
+    },
+    "rss": {
+      "feeds": "피드 주소, 한 줄에 하나"
+    },
+    "mail": {
+      "account": "메일 계정",
+      "accountPlaceholder": "mailcrawl에 설정한 계정 이름"
+    }
   },
   "sourceNames": {
     "kakaotalk": "카카오톡",
