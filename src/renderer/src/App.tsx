@@ -5,6 +5,7 @@ import { AppShortcuts } from '@/components/layout/AppShortcuts'
 import { Panel } from '@/components/layout/Panel'
 import { Spinner } from '@/components/ui/Spinner'
 import { screens } from '@/screens'
+import { Onboarding } from '@/screens/onboarding/Onboarding'
 import { useEngine } from '@/stores/engine'
 import { useNavigation, type Route } from '@/stores/navigation'
 import { useSettings } from '@/stores/settings'
@@ -33,6 +34,8 @@ export function App(): React.JSX.Element {
       </div>
     )
   }
+
+  if (!settings.onboarded) return <Onboarding />
 
   const Screen = screens[route]
   return (
