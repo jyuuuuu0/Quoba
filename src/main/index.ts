@@ -5,6 +5,7 @@ import { broadcast, registerIpc } from './ipc'
 import { PromiseStore } from './promise-store'
 import { Secrets } from './secrets'
 import { SettingsStore } from './settings-store'
+import { applySystemSettings } from './system'
 
 let mainWindow: BrowserWindow | undefined
 
@@ -61,11 +62,13 @@ app.whenReady().then(async () => {
     secrets,
     promises: new PromiseStore(),
     onSettingsChanged: () => {
+      applySystemSettings(store.get())
       void engine.request('configure', { settings: store.get() })
     }
   })
 
   mainWindow = createMainWindow()
+  applySystemSettings(store.get())
 
   await engine.request('configure', { settings: store.get() })
   if (store.get().onboarded) void engine.request('refresh', {})
