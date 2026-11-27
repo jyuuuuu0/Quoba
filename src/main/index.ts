@@ -2,6 +2,7 @@ import { join } from 'node:path'
 import { app, BrowserWindow, shell } from 'electron'
 import { EngineClient } from './engine'
 import { broadcast, registerIpc } from './ipc'
+import { PromiseStore } from './promise-store'
 import { Secrets } from './secrets'
 import { SettingsStore } from './settings-store'
 
@@ -58,6 +59,7 @@ app.whenReady().then(async () => {
     store,
     engine,
     secrets,
+    promises: new PromiseStore(),
     onSettingsChanged: () => {
       void engine.request('configure', { settings: store.get() })
     }

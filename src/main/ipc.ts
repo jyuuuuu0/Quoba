@@ -6,6 +6,7 @@ import type { InvokeChannel, QuobaEvents, QuobaInvoke } from '@shared/ipc'
 import { SHORTCUT_ACTIONS } from '@shared/settings'
 import { SOURCE_IDS } from '@shared/sources'
 import type { EngineClient } from './engine'
+import type { PromiseStore } from './promise-store'
 import type { Secrets } from './secrets'
 import type { SettingsStore } from './settings-store'
 
@@ -61,10 +62,11 @@ export interface IpcDeps {
   store: SettingsStore
   engine: EngineClient
   secrets: Secrets
+  promises: PromiseStore
   onSettingsChanged: (previous: ReturnType<SettingsStore['get']>) => void
 }
 
-export function registerIpc({ store, engine, secrets, onSettingsChanged }: IpcDeps): void {
+export function registerIpc({ store, engine, secrets, promises, onSettingsChanged }: IpcDeps): void {
   handle('settings:get', () => store.get())
   handle('settings:update', (params) => {
     const previous = store.get()
@@ -88,6 +90,17 @@ export function registerIpc({ store, engine, secrets, onSettingsChanged }: IpcDe
   handle('answer:cancel', (params) =>
     engine.request('cancelAnswer', { requestId: z.uuid().parse(params.requestId) })
   )
+
+  handle('promises:list', async () => {
+    const found = await engine.request('promises', { myNames: store.get().myNames })
+    return found.map((item) => ({ ...item, status: promises.status(item.id) }))
+  })
+  handle('promises:setStatus', (params) => {
+    const { id, status } = z
+      .object({ id: z.string().min(1).max(500), status: z.enum(['open', 'done', 'dismissed']) })
+      .parse(params)
+    promises.set(id, status)
+  })
 
   handle('sources:probe', () => engine.request('probeSources', {}))
   handle('sources:pickFolder', async () => {

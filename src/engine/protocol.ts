@@ -2,6 +2,7 @@ import type {
   AnswerEvent,
   AuthStatus,
   EngineStatus,
+  PromiseItem,
   SearchRequest,
   SearchResponse,
   SourceProbe
@@ -16,6 +17,7 @@ export interface EngineMethods {
   search: { params: SearchRequest & { myNames: string[] }; result: SearchResponse }
   answer: { params: SearchRequest & { requestId: string }; result: void }
   cancelAnswer: { params: { requestId: string }; result: void }
+  promises: { params: { myNames: string[] }; result: Omit<PromiseItem, 'status'>[] }
   probeSources: { params: Record<string, never>; result: SourceProbe[] }
   authStatus: { params: Record<string, never>; result: AuthStatus }
   login: { params: Record<string, never>; result: AuthStatus }
