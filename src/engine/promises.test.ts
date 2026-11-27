@@ -5,6 +5,8 @@ describe('isPromise', () => {
   it.each([
     '발표 자료는 제가 만들게요',
     '참고문헌 정리도 제가 할게요',
+    '시연 영상은 제가 찍을게요',
+    '내일 일찍 갈게',
     '금요일까지 보내드리겠습니다',
     "I'll send the deck tonight",
     'Leave it to me',
@@ -19,7 +21,9 @@ describe('isPromise', () => {
     'Can you send the deck?',
     'Who will book the room?',
     '誰がやりますか',
-    '좋아요'
+    '좋아요',
+    '그렇게 해요',
+    '쉽게 끝났네'
   ])('rejects a question or request: %s', (text) => {
     expect(isPromise(text)).toBe(false)
   })
