@@ -31,7 +31,9 @@ const icons = {
   notion: fromIconify('notion-icon'),
   obsidian: fromIconify('obsidian-icon'),
   // The GitHub mark is near-black; draw it light so it reads on the dark UI.
-  github: fromIconify('github-icon', (body) => body.replaceAll(/fill="#[0-9a-fA-F]{3,6}"/g, 'fill="#ECECEE"')),
+  github: fromIconify('github-icon', (body) =>
+    body.replaceAll(/fill="#[0-9a-fA-F]{3,6}"/g, 'fill="#ECECEE"')
+  ),
   kakaotalk: fromSimpleIcons(simpleIcons.siKakaotalk, '#FFCD00')
 }
 
