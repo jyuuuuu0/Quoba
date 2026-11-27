@@ -21,8 +21,8 @@ export default tseslint.config(
       'src/main/**/*.ts',
       'src/preload/**/*.ts',
       'src/engine/**/*.ts',
-      'scripts/**/*.{js,ts}',
-      'eval/**/*.{js,ts}'
+      'scripts/**/*.{js,mjs,ts}',
+      'eval/**/*.{js,mjs,ts}'
     ],
     languageOptions: { globals: globals.node }
   },
