@@ -4,9 +4,14 @@ import { join } from 'node:path'
 
 const dir = join(import.meta.dirname, '../src/renderer/src/i18n/locales')
 
+// Plural forms differ by language (English has _one and _other, Korean only _other), so compare base keys.
+const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/
+
 function keys(value, prefix = '') {
   return Object.entries(value).flatMap(([key, child]) =>
-    child && typeof child === 'object' ? keys(child, `${prefix}${key}.`) : [`${prefix}${key}`]
+    child && typeof child === 'object' && !Array.isArray(child)
+      ? keys(child, `${prefix}${key}.`)
+      : [`${prefix}${key.replace(PLURAL_SUFFIX, '')}`]
   )
 }
 
