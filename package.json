@@ -24,7 +24,8 @@
     "lint:i18n": "node scripts/check-locales.mjs",
     "test": "vitest run",
     "eval:generate": "node eval/generate.mjs",
-    "eval": "node eval/score.mts"
+    "eval": "node eval/score.mts",
+    "dist": "npm run build && electron-builder --publish never"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -35,6 +36,7 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.3.0",
     "electron": "^45.5.0",
+    "electron-builder": "^26.18.0",
     "electron-vite": "^6.0.0",
     "eslint": "^10.16.0",
     "eslint-plugin-react-hooks": "^7.1.1",

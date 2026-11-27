@@ -1,0 +1,39 @@
+appId: app.quoba.desktop
+productName: Quoba
+copyright: Copyright © 2026 jyuuuuu0
+directories:
+  buildResources: resources
+  output: dist
+files:
+  - out/**
+  - package.json
+  - '!**/*.map'
+# @autorag/librarian은 별도 프로세스(CLI)로도 실행되므로 asar 밖에 둔다
+asarUnpack:
+  - node_modules/@autorag/**
+  - resources/**
+extraResources:
+  - from: resources/brand
+    to: brand
+mac:
+  category: public.app-category.productivity
+  icon: resources/icon.png
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+  hardenedRuntime: true
+dmg:
+  artifactName: ${productName}-${version}-${arch}.${ext}
+win:
+  icon: resources/icon.png
+  target:
+    - target: nsis
+      arch: [x64]
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  artifactName: ${productName}-Setup-${version}.${ext}
+linux:
+  target: [AppImage]
+  category: Office
+publish: null
