@@ -11,7 +11,7 @@ import type { AnswerEvent, EngineStatus, PromiseItem, SearchResponse, SourceProb
 import type { Settings } from '@shared/settings'
 import { isSourceId } from '@shared/sources'
 import { DazziAuth } from './auth'
-import { buildDatasources, buildProbeDatasources, buildSearchPaths } from './config'
+import { buildDatasources, buildProbeDatasources, buildSearchPaths, narrowToSources } from './config'
 import { toCitation, toSearchHit, type RawAnswerResult, type RawResult } from './normalize'
 import { extractDue, isPromise, PROMISE_QUERIES } from './promises'
 import type { EngineEvent, EngineMethod, EngineMethods, EngineRequest, EngineResponse } from './protocol'
@@ -28,7 +28,7 @@ let librarianPromise: Promise<Librarian> | undefined
 let lite: Lite | undefined
 let settings: Settings | undefined
 let status: EngineStatus = { state: 'starting' }
-let auth: DazziAuth | undefined
+let authPromise: Promise<DazziAuth> | undefined
 const answers = new Map<string, AbortController>()
 
 function librarian(): Promise<Librarian> {
@@ -48,9 +48,15 @@ function setStatus(next: EngineStatus): EngineStatus {
   return status
 }
 
-async function getAuth(): Promise<DazziAuth> {
-  auth ??= await DazziAuth.create((url) => emit({ kind: 'event', event: 'open-url', data: { url } }))
-  return auth
+/** Concurrent callers share one instance, so a cancel reaches the sign-in it targets. */
+function getAuth(): Promise<DazziAuth> {
+  authPromise ??= DazziAuth.create((url) => emit({ kind: 'event', event: 'open-url', data: { url } })).catch(
+    (error: unknown) => {
+      authPromise = undefined
+      throw error
+    }
+  )
+  return authPromise
 }
 
 /** Writes AutoRAG's config from Quoba's settings and rebuilds the model-free runtime. */
@@ -124,19 +130,24 @@ async function search(params: EngineMethods['search']['params']): Promise<Search
 async function promises({ myNames }: { myNames: string[] }): Promise<Omit<PromiseItem, 'status'>[]> {
   const runtime = requireLite()
   const found = new Map<string, Omit<PromiseItem, 'status'>>()
+  const seen = new Set<string>()
   for (const query of PROMISE_QUERIES) {
     const { results } = await runtime.searchSelected(query, undefined, { topK: 60 })
     for (const result of results as RawResult[]) {
       const hit = toSearchHit(result, myNames)
-      if (!hit.isMe || found.has(hit.id)) continue
-      // A chat chunk can hold several lines; keep the line that makes the promise.
-      const line = hit.text.split(/\n+/).find((text) => isPromise(text))
-      if (!line) continue
-      const due = extractDue(line, hit.time ? new Date(hit.time) : new Date())
-      found.set(hit.id, {
-        id: hit.id,
-        hit: { ...hit, text: line.trim() },
-        ...(due ? { due: due.toISOString() } : {})
+      if (!hit.isMe || seen.has(hit.id)) continue
+      seen.add(hit.id)
+      // A chat chunk can hold several lines and several promises; keep each one separately.
+      // The line number keeps ids stable, so each promise is completed or dismissed on its own.
+      hit.text.split(/\n+/).forEach((line, index) => {
+        if (!isPromise(line)) return
+        const due = extractDue(line, hit.time ? new Date(hit.time) : new Date())
+        const id = `${hit.id}#${index}`
+        found.set(id, {
+          id,
+          hit: { ...hit, text: line.trim() },
+          ...(due ? { due: due.toISOString() } : {})
+        })
       })
     }
   }
@@ -156,12 +167,22 @@ function answerError(error: unknown, signedIn: boolean): AnswerEvent {
 async function answer(params: EngineMethods['answer']['params']): Promise<void> {
   const send = (event: AnswerEvent): void =>
     emit({ kind: 'event', event: 'answer', data: { requestId: params.requestId, event } })
+  const filters = params.filters ?? {}
+  if (filters.saidByMe) {
+    // The agent cannot restrict evidence by author, so refuse rather than answer from everyone's messages.
+    send({ type: 'error', code: 'unknown', message: 'AI answers do not support the "said by me" filter' })
+    return
+  }
   const abort = new AbortController()
   answers.set(params.requestId, abort)
   const signedIn = (await getAuth()).status().signedIn
   try {
     const lib = await librarian()
-    const config = lib.resolveConfig({ flags: {}, env, cwd: autoragHome })
+    const config = narrowToSources(
+      lib.resolveConfig({ flags: {}, env, cwd: autoragHome }),
+      filters.sources ?? [],
+      join(autoragHome, 'empty')
+    )
     const resolved = await lib.resolveAgentModel(config, { env, cwd: autoragHome })
     const agent = new lib.AutoRAGAgent({
       ...lib.buildAgentOptions(config),
@@ -169,7 +190,6 @@ async function answer(params: EngineMethods['answer']['params']): Promise<void> 
       ...(resolved.apiKey !== undefined ? { apiKey: resolved.apiKey } : {}),
       ...(resolved.providerApiKeys !== undefined ? { providerApiKeys: resolved.providerApiKeys } : {})
     })
-    const filters = params.filters ?? {}
     const stream = agent.searchDocumentsStream(params.query, {
       signal: abort.signal,
       ...(filters.since ? { since: Date.parse(filters.since) } : {}),

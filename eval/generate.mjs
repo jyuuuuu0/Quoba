@@ -49,7 +49,8 @@ const messages = []
 let clock = new Date(2026, 8, 1, 9, 0).getTime()
 
 function say(room, author, text) {
-  clock += Math.floor(20 + random() * 400) * 60_000
+  // About 200 messages at ~11 hours apart on average cover the three months from Sep 1.
+  clock += Math.floor(300 + random() * 700) * 60_000
   const message = { id: `m${messages.length + 1}`, room, author, time: new Date(clock), text }
   messages.push(message)
   return message
