@@ -49,6 +49,7 @@
     "configure": "設定",
     "howToConnect": "接続方法",
     "installHelp": "Quobaは{{tool}}が保存した履歴を読み込みます。{{tool}}をインストールして一度サインインし、「再確認」を押してください。",
+    "setupHelp": "{{tool}} はインストール済みですが、まだ設定が完了していません。下の手順を済ませてから「再確認」を押してください。",
     "toggle": "{{name}}を検索",
     "removeFolder": "フォルダを削除",
     "chooseFolder": "フォルダを選択",
@@ -154,6 +155,7 @@
     "empty": "結果を選ぶとここに表示されます。",
     "copy": "コピー",
     "copied": "コピーしました",
+    "copyFailed": "コピーできませんでした",
     "toggle": "コンテキストパネルの表示切替"
   },
   "promises": {

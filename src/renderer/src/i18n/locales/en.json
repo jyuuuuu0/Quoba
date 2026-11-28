@@ -49,6 +49,7 @@
     "configure": "Set up",
     "howToConnect": "How to connect",
     "installHelp": "Quoba reads {{tool}}'s local archive. Install {{tool}}, sign in with it once, then press Check again.",
+    "setupHelp": "{{tool}} is installed but not set up yet. Finish the step below, then press Check again.",
     "toggle": "Search {{name}}",
     "removeFolder": "Remove folder",
     "chooseFolder": "Choose folder",
@@ -156,6 +157,7 @@
     "empty": "Select a result to see it here.",
     "copy": "Copy",
     "copied": "Copied",
+    "copyFailed": "Couldn't copy",
     "toggle": "Toggle context panel"
   },
   "promises": {

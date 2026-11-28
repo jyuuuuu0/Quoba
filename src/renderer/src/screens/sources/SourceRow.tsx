@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import { ChevronDown, FolderPlus, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import type { SourceSettings } from '@shared/settings'
 import type { SourceDefinition } from '@shared/sources'
 import { Button } from '@/components/ui/Button'
 import { SourceIcon } from '@/components/ui/SourceIcon'
@@ -91,6 +92,17 @@ function FolderList({
   )
 }
 
+/**
+ * Whether a list-based source (folders, repos, feeds) is on after its list changes.
+ * The first entry turns it on, an empty list turns it off, and any other edit keeps
+ * the switch where the user left it.
+ */
+function enabledAfter(current: SourceSettings, before: number, after: number): boolean {
+  if (after === 0) return false
+  if (before === 0) return true
+  return current.enabled
+}
+
 /** Setup fields for sources that need more than a switch. */
 function SetupFields({ source }: { source: SourceDefinition }): React.JSX.Element | null {
   const { t } = useTranslation()
@@ -112,7 +124,7 @@ function SetupFields({ source }: { source: SourceDefinition }): React.JSX.Elemen
           onChange={(update) =>
             void save(source.id, (current) => {
               const paths = update(current.paths ?? [])
-              return { paths, enabled: paths.length > 0 }
+              return { paths, enabled: enabledAfter(current, current.paths?.length ?? 0, paths.length) }
             })
           }
         />
@@ -126,7 +138,10 @@ function SetupFields({ source }: { source: SourceDefinition }): React.JSX.Elemen
             if (token) await setGithubToken(token)
             setToken('')
             const list = repos.split(/[,\s]+/).filter((repo) => /^[\w.-]+\/[\w.-]+$/.test(repo))
-            await save('github', { repos: list, enabled: list.length > 0 })
+            await save('github', (current) => ({
+              repos: list,
+              enabled: enabledAfter(current, current.repos?.length ?? 0, list.length)
+            }))
           }}
         >
           <input
@@ -157,7 +172,10 @@ function SetupFields({ source }: { source: SourceDefinition }): React.JSX.Elemen
           onSubmit={(event) => {
             event.preventDefault()
             const list = feeds.split(/\s+/).filter((url) => /^https?:\/\//.test(url))
-            void save('rss', { feeds: list, enabled: list.length > 0 })
+            void save('rss', (current) => ({
+              feeds: list,
+              enabled: enabledAfter(current, current.feeds?.length ?? 0, list.length)
+            }))
           }}
         >
           <textarea
@@ -207,7 +225,12 @@ export function SourceRow({ source }: { source: SourceDefinition }): React.JSX.E
   const enabled = options?.enabled === true
 
   const needsTool = source.setup === 'cli' && probe?.state === 'missing-tool'
+  // The tool is installed but still needs a step of its own (for example signing in).
+  const needsSetup = source.setup === 'cli' && probe?.state === 'needs-setup'
   const hasFields = source.setup !== 'cli' || source.id === 'mail'
+  // Folder, repo and feed sources can be switched off without losing what was entered.
+  const hasConfig =
+    (options?.paths?.length ?? 0) + (options?.repos?.length ?? 0) + (options?.feeds?.length ?? 0) > 0
   let badge: React.ReactNode = null
   // A failed check wins over "enabled": the switch only says the source is selected, not that it works.
   if (needsTool) badge = <Badge tone="warn">{t('sources.state.needsTool', { tool: source.cli })}</Badge>
@@ -227,14 +250,14 @@ export function SourceRow({ source }: { source: SourceDefinition }): React.JSX.E
           </span>
           <span className="truncate text-sm text-fg-subtle">{t(`sources.about.${source.id}`)}</span>
         </div>
-        {(hasFields || needsTool) && (
+        {(hasFields || needsTool || needsSetup) && (
           <button
             type="button"
             aria-expanded={open}
             onClick={() => setOpen(!open)}
             className="flex items-center gap-1 rounded-control px-2 py-1 text-sm text-fg-muted hover:bg-hover hover:text-fg"
           >
-            {needsTool ? t('sources.howToConnect') : t('sources.configure')}
+            {needsTool || needsSetup ? t('sources.howToConnect') : t('sources.configure')}
             <ChevronDown
               aria-hidden="true"
               size={13}
@@ -242,7 +265,7 @@ export function SourceRow({ source }: { source: SourceDefinition }): React.JSX.E
             />
           </button>
         )}
-        {source.setup === 'cli' && (
+        {(source.setup === 'cli' || hasConfig) && (
           <Switch
             checked={enabled}
             disabled={!enabled && needsTool}
@@ -261,6 +284,12 @@ export function SourceRow({ source }: { source: SourceDefinition }): React.JSX.E
                   npm install -g {source.cliPackage}
                 </code>
               )}
+              {probe?.detail && <p className="m-0 text-xs text-fg-subtle">{probe.detail}</p>}
+            </div>
+          )}
+          {needsSetup && (
+            <div className="flex flex-col gap-1.5 text-sm text-fg-muted">
+              <p className="m-0">{t('sources.setupHelp', { tool: source.cli })}</p>
               {probe?.detail && <p className="m-0 text-xs text-fg-subtle">{probe.detail}</p>}
             </div>
           )}

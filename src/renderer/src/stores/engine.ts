@@ -45,8 +45,12 @@ export const useEngine = create<EngineState>((set) => ({
   },
   cancelSignIn: async () => {
     signInAttempt++
-    await api.invoke('auth:cancel')
-    set({ signingIn: false })
+    try {
+      await api.invoke('auth:cancel')
+    } finally {
+      // The attempt counter already moved on, so nothing else would clear the flag.
+      set({ signingIn: false })
+    }
   },
   signOut: async () => {
     set({ auth: await api.invoke('auth:logout') })
