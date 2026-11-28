@@ -82,12 +82,13 @@ export const useSearch = create<SearchState>((set, get) => ({
     try {
       const response = await api.invoke('search:run', request)
       if (run !== currentRun) return
-      set({
+      set((state) => ({
         hits: response.hits,
         partial: response.unsearched.length > 0,
         loading: false,
-        selection: response.hits[0] ? { kind: 'hit', hit: response.hits[0] } : undefined
-      })
+        // Keep a citation the user picked while results were loading; otherwise show the top hit.
+        selection: state.selection ?? (response.hits[0] ? { kind: 'hit', hit: response.hits[0] } : undefined)
+      }))
     } catch (error) {
       if (run !== currentRun) return
       set({ loading: false, hits: [], error: error instanceof Error ? error.message : String(error) })
