@@ -63,14 +63,28 @@ export interface IpcDeps {
   engine: EngineClient
   secrets: Secrets
   promises: PromiseStore
+  /** Registers the global shortcut natively; false when another app already owns it. */
+  registerGlobalShortcut: (accelerator: string | null) => boolean
   onSettingsChanged: (previous: ReturnType<SettingsStore['get']>) => void
 }
 
-export function registerIpc({ store, engine, secrets, promises, onSettingsChanged }: IpcDeps): void {
+export function registerIpc({
+  store,
+  engine,
+  secrets,
+  promises,
+  registerGlobalShortcut,
+  onSettingsChanged
+}: IpcDeps): void {
   handle('settings:get', () => store.get())
   handle('settings:update', (params) => {
     const previous = store.get()
-    const next = store.update(settingsPatch.parse(params))
+    const patch = settingsPatch.parse(params)
+    // Register first, so a shortcut another app owns is never saved as if it worked.
+    if (patch.globalShortcut !== undefined && !registerGlobalShortcut(patch.globalShortcut)) {
+      throw new Error('global-shortcut-unavailable')
+    }
+    const next = store.update(patch)
     onSettingsChanged(previous)
     broadcast('settings:changed', next)
     return next
