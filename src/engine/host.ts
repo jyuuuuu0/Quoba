@@ -186,22 +186,32 @@ async function answer(params: EngineMethods['answer']['params']): Promise<void> 
 
 function cliPath(): string {
   const require = createRequire(import.meta.url)
-  return join(dirname(require.resolve('@autorag/librarian/package.json')), 'dist/cli/index.js')
+  // The package does not export ./package.json; its root entry is dist/index.js, next to dist/cli.
+  return join(dirname(require.resolve('@autorag/librarian')), 'cli/index.js')
 }
+
+/** `autorag setup` checks external CLIs; a stuck check must not hang the probe forever. */
+const CLI_TIMEOUT_MS = 60_000
 
 function runCli(args: string[], extraEnv: NodeJS.ProcessEnv): Promise<string> {
   return new Promise((resolve, reject) => {
     // The Electron binary runs as plain Node with ELECTRON_RUN_AS_NODE.
     const child = spawn(process.execPath, [cliPath(), ...args], {
       env: { ...env, ...extraEnv, ELECTRON_RUN_AS_NODE: '1' },
-      stdio: ['ignore', 'pipe', 'pipe']
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: CLI_TIMEOUT_MS
     })
     let stdout = ''
     let stderr = ''
     child.stdout.on('data', (chunk: Buffer) => (stdout += chunk.toString()))
     child.stderr.on('data', (chunk: Buffer) => (stderr += chunk.toString()))
     child.on('error', reject)
-    child.on('close', (code) => (code === 0 ? resolve(stdout) : reject(new Error(stderr || `exit ${code}`))))
+    child.on('close', (code, signal) => {
+      if (code === 0) resolve(stdout)
+      else if (signal)
+        reject(new Error(`autorag ${args[0]} stopped (${signal}), possibly after ${CLI_TIMEOUT_MS} ms`))
+      else reject(new Error(stderr || `exit ${code}`))
+    })
   })
 }
 
