@@ -130,19 +130,24 @@ async function search(params: EngineMethods['search']['params']): Promise<Search
 async function promises({ myNames }: { myNames: string[] }): Promise<Omit<PromiseItem, 'status'>[]> {
   const runtime = requireLite()
   const found = new Map<string, Omit<PromiseItem, 'status'>>()
+  const seen = new Set<string>()
   for (const query of PROMISE_QUERIES) {
     const { results } = await runtime.searchSelected(query, undefined, { topK: 60 })
     for (const result of results as RawResult[]) {
       const hit = toSearchHit(result, myNames)
-      if (!hit.isMe || found.has(hit.id)) continue
-      // A chat chunk can hold several lines; keep the line that makes the promise.
-      const line = hit.text.split(/\n+/).find((text) => isPromise(text))
-      if (!line) continue
-      const due = extractDue(line, hit.time ? new Date(hit.time) : new Date())
-      found.set(hit.id, {
-        id: hit.id,
-        hit: { ...hit, text: line.trim() },
-        ...(due ? { due: due.toISOString() } : {})
+      if (!hit.isMe || seen.has(hit.id)) continue
+      seen.add(hit.id)
+      // A chat chunk can hold several lines and several promises; keep each one separately.
+      // The line number keeps ids stable, so each promise is completed or dismissed on its own.
+      hit.text.split(/\n+/).forEach((line, index) => {
+        if (!isPromise(line)) return
+        const due = extractDue(line, hit.time ? new Date(hit.time) : new Date())
+        const id = `${hit.id}#${index}`
+        found.set(id, {
+          id,
+          hit: { ...hit, text: line.trim() },
+          ...(due ? { due: due.toISOString() } : {})
+        })
       })
     }
   }
