@@ -36,6 +36,8 @@ export function NamesInput(): React.JSX.Element {
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={(event) => {
+          // Enter also confirms IME composition (Korean, Japanese); let that finish first.
+          if (event.nativeEvent.isComposing) return
           if (event.key === 'Enter' || event.key === ',') {
             event.preventDefault()
             add()

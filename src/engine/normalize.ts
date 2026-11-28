@@ -11,7 +11,16 @@ export interface RawResult {
 }
 
 const AUTHOR_KEYS = ['authorName', 'author', 'senderName', 'sender', 'from', 'userName', 'user', 'speaker']
-const TIME_KEYS = ['publishedAt', 'timestamp', 'sentAt', 'date', 'createdAt', 'time', 'updatedAt']
+const TIME_KEYS = [
+  'publishedAt',
+  'sourceMtimeMs',
+  'timestamp',
+  'sentAt',
+  'date',
+  'createdAt',
+  'time',
+  'updatedAt'
+]
 const PLACE_KEYS = [
   'channelName',
   'chatName',

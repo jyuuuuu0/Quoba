@@ -54,14 +54,33 @@ function Names(): React.JSX.Element {
 function Sources(): React.JSX.Element {
   const { t } = useTranslation()
   const probe = useSources((state) => state.probe)
+  const probing = useSources((state) => state.probing)
+  const probeFailed = useSources((state) => state.probeFailed)
   useEffect(() => {
     void probe()
   }, [probe])
   return (
     <div className="flex min-h-0 flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <h1 className="m-0 text-xl font-semibold">{t('onboarding.sources.title')}</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="m-0 text-xl font-semibold">{t('onboarding.sources.title')}</h1>
+          {/* After installing a missing tool, check again without leaving this step. */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="ml-auto"
+            disabled={probing}
+            onClick={() => void probe()}
+          >
+            {t('sources.checkAgain')}
+          </Button>
+        </div>
         <p className="m-0 text-fg-muted">{t('onboarding.sources.body')}</p>
+        {probeFailed && (
+          <p role="alert" className="m-0 text-sm text-fg-subtle">
+            {t('sources.probeFailed')}
+          </p>
+        )}
       </div>
       <ul className="scroll-thin m-0 max-h-[340px] list-none overflow-y-auto p-0 pr-1">
         {SOURCES.filter((source) => !source.advanced).map((source) => (
@@ -77,6 +96,7 @@ function Ai(): React.JSX.Element {
   const auth = useEngine((state) => state.auth)
   const signingIn = useEngine((state) => state.signingIn)
   const signIn = useEngine((state) => state.signIn)
+  const cancelSignIn = useEngine((state) => state.cancelSignIn)
   return (
     <div className="flex flex-col gap-4">
       <h1 className="m-0 text-xl font-semibold">{t('onboarding.ai.title')}</h1>
@@ -87,9 +107,16 @@ function Ai(): React.JSX.Element {
           {t('settings.account.signedIn')}
         </p>
       ) : (
-        <Button variant="primary" className="self-start" disabled={signingIn} onClick={() => void signIn()}>
-          {signingIn ? t('answer.waitingForBrowser') : t('onboarding.ai.signIn')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="primary" disabled={signingIn} onClick={() => void signIn()}>
+            {signingIn ? t('answer.waitingForBrowser') : t('onboarding.ai.signIn')}
+          </Button>
+          {signingIn && (
+            <Button variant="ghost" onClick={() => void cancelSignIn()}>
+              {t('common.cancel')}
+            </Button>
+          )}
+        </div>
       )}
       <p className="m-0 text-sm text-fg-subtle">{t('settings.privacy.ai')}</p>
     </div>

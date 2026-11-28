@@ -58,12 +58,15 @@ IPC 입력은 zod로 검증하고, 렌더러는 sandbox와 contextIsolation이 �
 ## 릴리스
 
 `v*` 태그를 푸시하면 GitHub Actions가 macOS · Windows 설치 파일을 만들어 드래프트 릴리스에 올립니다.
+설치 파일 버전은 태그가 아니라 `package.json`의 `version`을 따르므로, 태그 전에 버전을 먼저 올립니다.
 
 ```bash
-git tag v0.1.0 && git push origin v0.1.0
+npm version 0.1.1 --no-git-tag-version
+git commit -am "chore: v0.1.1 릴리스"
+git tag v0.1.1 && git push origin main v0.1.1
 ```
 
-코드 서명은 아직 설정하지 않아 첫 실행 시 OS 경고가 뜹니다.
+macOS 빌드는 Developer ID 인증서 없이 ad-hoc 서명만 되어 있어, 첫 실행 시 OS 경고가 뜹니다.
 
 ## 커밋 규칙
 

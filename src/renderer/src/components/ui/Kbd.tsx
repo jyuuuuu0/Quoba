@@ -34,6 +34,14 @@ export function Shortcut({ accelerator }: { accelerator: string }): React.JSX.El
         return isMac ? '⌃' : 'Ctrl'
       case 'Enter':
         return '↵'
+      case 'Up':
+        return '↑'
+      case 'Down':
+        return '↓'
+      case 'Left':
+        return '←'
+      case 'Right':
+        return '→'
       default:
         return key
     }

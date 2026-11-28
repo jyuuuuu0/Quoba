@@ -54,3 +54,21 @@ export function buildProbeDatasources(): Record<string, DatasourceEntry> {
   }
   return entries
 }
+
+/**
+ * Narrows AutoRAG's config to the sources a search asked for, so AI answers honour the same
+ * source filter as plain search. No selection leaves the config unchanged.
+ */
+export function narrowToSources<
+  T extends { searchPaths: string[]; datasources?: Readonly<Record<string, unknown>> }
+>(config: T, sources: readonly string[], emptyRoot: string): T {
+  if (sources.length === 0) return config
+  const datasources = Object.fromEntries(
+    Object.entries(config.datasources ?? {}).filter(([id]) => sources.includes(id))
+  )
+  return {
+    ...config,
+    searchPaths: sources.includes('files') ? config.searchPaths : [emptyRoot],
+    datasources
+  }
+}

@@ -42,6 +42,7 @@
     "intro": "Choose where Quoba looks. Everything is read and indexed on this computer.",
     "checkAgain": "Check again",
     "checking": "Checking sources",
+    "probeFailed": "Couldn't check your sources. Press “Check again” to retry.",
     "indexNow": "Index now",
     "showMore": "Show more sources",
     "privacy": "Chats, mail and files never leave this computer. Only when you ask for an AI answer are the few relevant excerpts sent to the AI model.",
@@ -223,6 +224,7 @@
       "pressKeys": "Press keys…",
       "change": "Change shortcut for {{action}}",
       "taken": "Already used",
+      "unavailable": "Used by another app",
       "help": "Click a shortcut and press new keys. Backspace clears it.",
       "reset": "Reset to defaults"
     },
