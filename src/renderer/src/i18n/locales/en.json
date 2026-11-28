@@ -54,5 +54,54 @@
     "rss": "RSS feeds",
     "lark": "Lark",
     "browser": "Browser history"
+  },
+  "search": {
+    "label": "Search everything you said",
+    "placeholder": "Search what was said… e.g. who said they'd make the slides",
+    "allSources": "All sources",
+    "nSources_one": "{{count}} source",
+    "nSources_other": "{{count}} sources",
+    "range": {
+      "any": "Anytime",
+      "week": "Past week",
+      "month": "Past month",
+      "year": "Past year"
+    },
+    "saidByMe": "Said by me",
+    "resultCount_one": "{{count}} result",
+    "resultCount_other": "{{count}} results",
+    "openSource": "Open source {{number}}",
+    "tryAsking": "Try asking",
+    "suggestions": [
+      "What did I promise to do this week?",
+      "When is the presentation due?",
+      "Who said they'd book the venue?"
+    ],
+    "noSources": "Connect a chat app, your mail or a folder to start searching.",
+    "failed": "Search didn't work. Check Sources and try again.",
+    "noResults": "Nothing found. Try other words or widen the filters.",
+    "partial": "Some sources were busy and skipped. Results may be incomplete."
+  },
+  "answer": {
+    "label": "Answer",
+    "thinking": "Reading your messages…",
+    "verifying": "Double-checking…",
+    "signInTitle": "Get an AI answer with sources",
+    "signInBody": "Sign in once in your browser. No API key needed.",
+    "signIn": "Sign in",
+    "waitingForBrowser": "Waiting for browser…",
+    "errors": {
+      "signed-out": "Sign in to get AI answers.",
+      "model-unavailable": "The AI model isn't available right now. Your search results are below.",
+      "network": "Couldn't reach the AI service. Check your connection.",
+      "unknown": "Couldn't write an answer this time. Your search results are below."
+    }
+  },
+  "context": {
+    "label": "Context",
+    "empty": "Select a result to see it here.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "toggle": "Toggle context panel"
   }
 }

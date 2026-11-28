@@ -54,5 +54,52 @@
     "rss": "RSS 피드",
     "lark": "Lark",
     "browser": "브라우저 기록"
+  },
+  "search": {
+    "label": "내가 한 모든 말 검색",
+    "placeholder": "했던 말을 검색하세요… 예: 발표 자료 누가 만든다고 했지",
+    "allSources": "모든 소스",
+    "nSources_other": "소스 {{count}}개",
+    "range": {
+      "any": "전체 기간",
+      "week": "지난 1주",
+      "month": "지난 1개월",
+      "year": "지난 1년"
+    },
+    "saidByMe": "내가 한 말",
+    "resultCount_other": "결과 {{count}}개",
+    "openSource": "출처 {{number}} 열기",
+    "tryAsking": "이렇게 물어보세요",
+    "suggestions": [
+      "이번 주에 내가 하겠다고 한 거",
+      "발표 마감이 언제였지?",
+      "장소 예약은 누가 한다고 했어?"
+    ],
+    "noSources": "검색하려면 채팅 앱, 메일, 폴더를 연결하세요.",
+    "failed": "검색에 실패했어요. 소스를 확인하고 다시 시도하세요.",
+    "noResults": "찾지 못했어요. 다른 단어로 찾거나 필터를 넓혀 보세요.",
+    "partial": "일부 소스가 사용 중이라 건너뛰었어요. 결과가 모두 나오지 않았을 수 있어요."
+  },
+  "answer": {
+    "label": "답변",
+    "thinking": "메시지를 읽는 중…",
+    "verifying": "다시 확인하는 중…",
+    "signInTitle": "출처가 달린 AI 답변 받기",
+    "signInBody": "브라우저에서 한 번만 로그인하세요. API 키는 필요 없어요.",
+    "signIn": "로그인",
+    "waitingForBrowser": "브라우저에서 기다리는 중…",
+    "errors": {
+      "signed-out": "AI 답변을 받으려면 로그인하세요.",
+      "model-unavailable": "지금은 AI 모델을 쓸 수 없어요. 아래 검색 결과를 확인하세요.",
+      "network": "AI 서비스에 연결하지 못했어요. 인터넷 연결을 확인하세요.",
+      "unknown": "이번에는 답변을 만들지 못했어요. 아래 검색 결과를 확인하세요."
+    }
+  },
+  "context": {
+    "label": "맥락",
+    "empty": "결과를 선택하면 여기에 보여요.",
+    "copy": "복사",
+    "copied": "복사됨",
+    "toggle": "맥락 패널 열기/닫기"
   }
 }
