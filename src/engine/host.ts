@@ -79,7 +79,16 @@ function requireLite(): Lite {
   return lite
 }
 
-async function refresh(force = false): Promise<EngineStatus> {
+// Refreshes run one at a time, so an earlier run cannot report `ready` while a later one indexes.
+let refreshQueue: Promise<unknown> = Promise.resolve()
+
+function refresh(force = false): Promise<EngineStatus> {
+  const run = refreshQueue.then(() => runRefresh(force))
+  refreshQueue = run.catch(() => undefined)
+  return run
+}
+
+async function runRefresh(force: boolean): Promise<EngineStatus> {
   const runtime = requireLite()
   setStatus({ ...status, state: 'indexing', progress: undefined, error: undefined })
   try {
@@ -146,8 +155,9 @@ async function answer(params: EngineMethods['answer']['params']): Promise<void> 
   }
   const abort = new AbortController()
   answers.set(params.requestId, abort)
-  const signedIn = (await getAuth()).status().signedIn
+  let signedIn = false
   try {
+    signedIn = (await getAuth()).status().signedIn
     const lib = await librarian()
     const config = narrowToSources(
       lib.resolveConfig({ flags: {}, env, cwd: autoragHome }),
@@ -252,7 +262,8 @@ const handlers: {
   status: async () => status,
   search,
   answer: async (params) => {
-    void answer(params)
+    // answer() reports its own failures as events; never let one escape as an unhandled rejection.
+    answer(params).catch((error: unknown) => console.error('Answer failed', error))
   },
   cancelAnswer: async ({ requestId }) => {
     answers.get(requestId)?.abort()
