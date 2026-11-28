@@ -107,13 +107,20 @@ export function registerIpc({ store, engine, secrets, promises, onSettingsChange
     const result = await dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] })
     return result.canceled ? null : (result.filePaths[0] ?? null)
   })
-  handle('sources:setToken', async (params) => {
+  // Each token change finishes saving, restarting and configuring before the next one starts,
+  // so a later change cannot kill the engine an earlier one is still configuring.
+  let tokenUpdates: Promise<void> = Promise.resolve()
+  handle('sources:setToken', (params) => {
     const { token } = z
       .object({ sourceId: z.literal('github'), token: z.string().max(400).nullable() })
       .parse(params)
-    secrets.set('GITHUB_TOKEN', token)
-    await engine.restart(secrets.env())
-    await engine.request('configure', { settings: store.get() })
+    const update = tokenUpdates.then(async () => {
+      secrets.set('GITHUB_TOKEN', token)
+      await engine.restart(secrets.env())
+      await engine.request('configure', { settings: store.get() })
+    })
+    tokenUpdates = update.catch(() => undefined)
+    return update
   })
 
   handle('auth:status', () => engine.request('authStatus', {}))
