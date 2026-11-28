@@ -224,6 +224,7 @@
       "pressKeys": "Press keys…",
       "change": "Change shortcut for {{action}}",
       "taken": "Already used",
+      "unavailable": "Used by another app",
       "help": "Click a shortcut and press new keys. Backspace clears it.",
       "reset": "Reset to defaults"
     },

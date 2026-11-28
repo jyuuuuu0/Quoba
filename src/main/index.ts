@@ -5,7 +5,7 @@ import { broadcast, registerIpc } from './ipc'
 import { PromiseStore } from './promise-store'
 import { Secrets } from './secrets'
 import { SettingsStore } from './settings-store'
-import { applySystemSettings } from './system'
+import { applyGlobalShortcut, applySystemSettings, setWindowFactory } from './system'
 
 let mainWindow: BrowserWindow | undefined
 
@@ -61,6 +61,7 @@ app.whenReady().then(async () => {
     engine,
     secrets,
     promises: new PromiseStore(),
+    registerGlobalShortcut: applyGlobalShortcut,
     onSettingsChanged: () => {
       applySystemSettings(store.get())
       void engine.request('configure', { settings: store.get() })
@@ -72,6 +73,7 @@ app.whenReady().then(async () => {
   })
   app.on('before-quit', () => engine.stop())
 
+  setWindowFactory(() => (mainWindow = createMainWindow()))
   mainWindow = createMainWindow()
   applySystemSettings(store.get())
 

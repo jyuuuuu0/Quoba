@@ -222,6 +222,7 @@
       "pressKeys": "키를 누르세요…",
       "change": "{{action}} 단축키 바꾸기",
       "taken": "이미 사용 중",
+      "unavailable": "다른 앱이 사용 중",
       "help": "단축키를 누르고 새 키를 입력하세요. Backspace로 지울 수 있어요.",
       "reset": "기본값으로 되돌리기"
     },

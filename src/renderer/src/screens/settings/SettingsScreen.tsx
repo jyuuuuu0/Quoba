@@ -211,7 +211,7 @@ export function SettingsScreen(): React.JSX.Element | null {
                   label={t('settings.shortcuts.global')}
                   value={settings.globalShortcut}
                   taken={takenExcept(settings.globalShortcut)}
-                  onChange={(globalShortcut) => void update({ globalShortcut })}
+                  onChange={(globalShortcut) => update({ globalShortcut })}
                 />
               }
             />
