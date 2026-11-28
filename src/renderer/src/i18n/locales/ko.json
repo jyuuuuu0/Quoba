@@ -1,0 +1,23 @@
+{
+  "app": {
+    "name": "Quoba",
+    "tagline": "내가 한 모든 말을 한곳에서."
+  },
+  "common": {
+    "cancel": "취소",
+    "save": "저장",
+    "close": "닫기",
+    "retry": "다시 시도",
+    "loading": "불러오는 중…",
+    "me": "나",
+    "connect": "연결",
+    "disconnect": "연결 해제",
+    "continue": "계속",
+    "back": "뒤로",
+    "done": "완료",
+    "notSet": "설정 안 됨"
+  },
+  "language": {
+    "label": "언어"
+  }
+}

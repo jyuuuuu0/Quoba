@@ -1,0 +1,23 @@
+{
+  "app": {
+    "name": "Quoba",
+    "tagline": "Everything you said, in one place."
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "me": "Me",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "continue": "Continue",
+    "back": "Back",
+    "done": "Done",
+    "notSet": "Not set"
+  },
+  "language": {
+    "label": "Language"
+  }
+}
