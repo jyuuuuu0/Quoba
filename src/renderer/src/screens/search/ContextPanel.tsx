@@ -44,7 +44,7 @@ export function ContextPanel(): React.JSX.Element {
   return (
     <aside
       aria-label={t('context.label')}
-      className="flex w-[288px] shrink-0 flex-col gap-4 border-l border-line bg-rail px-4 py-5"
+      className="scroll-thin flex w-[288px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-line bg-rail px-4 py-5"
     >
       <div className="flex items-center gap-2.5">
         <SourceIcon source={detail.sourceId} size={22} />

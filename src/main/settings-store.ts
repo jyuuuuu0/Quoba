@@ -31,8 +31,9 @@ export class SettingsStore {
       sources: { ...this.value.sources, ...patch.sources }
     }
     if (!isLanguage(next.language)) next.language = this.value.language
+    // Write first: a failed save must not leave unsaved settings in memory.
+    this.save(next)
     this.value = next
-    this.save()
     return this.get()
   }
 
@@ -52,10 +53,10 @@ export class SettingsStore {
     }
   }
 
-  private save(): void {
+  private save(value: Settings): void {
     mkdirSync(dirname(this.path), { recursive: true })
     const temp = `${this.path}.tmp`
-    writeFileSync(temp, `${JSON.stringify(this.value, null, 2)}\n`)
+    writeFileSync(temp, `${JSON.stringify(value, null, 2)}\n`)
     renameSync(temp, this.path)
   }
 }
