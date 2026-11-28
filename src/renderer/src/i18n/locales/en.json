@@ -157,5 +157,29 @@
     "copy": "Copy",
     "copied": "Copied",
     "toggle": "Toggle context panel"
+  },
+  "promises": {
+    "intro": "Things you said you'd do, collected from your own messages. Tick them off as you go.",
+    "scan": "Scan again",
+    "needNames": "Add the names you use in chats so Quoba knows which messages are yours.",
+    "addNames": "Add my names",
+    "failed": "Couldn't collect promises. Check Sources and try again.",
+    "empty": "No promises found yet.",
+    "markDone": "Mark as done",
+    "dismiss": "Not a promise",
+    "due": "Due {{date}}",
+    "groups": {
+      "overdue": "Overdue",
+      "thisWeek": "This week",
+      "later": "Later",
+      "noDate": "No date",
+      "done": "Done"
+    }
+  },
+  "timeline": {
+    "intro": "Pick a topic to see who said what about it, in order.",
+    "label": "Topic",
+    "placeholder": "A topic, e.g. presentation date",
+    "empty": "Nothing dated found for this topic."
   }
 }

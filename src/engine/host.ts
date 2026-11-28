@@ -7,12 +7,13 @@ import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
-import type { AnswerEvent, EngineStatus, SearchResponse, SourceProbe } from '@shared/engine'
+import type { AnswerEvent, EngineStatus, PromiseItem, SearchResponse, SourceProbe } from '@shared/engine'
 import type { Settings } from '@shared/settings'
 import { isSourceId } from '@shared/sources'
 import { DazziAuth } from './auth'
 import { buildDatasources, buildProbeDatasources, buildSearchPaths, narrowToSources } from './config'
 import { toCitation, toSearchHit, type RawAnswerResult, type RawResult } from './normalize'
+import { extractDue, isPromise, PROMISE_QUERIES } from './promises'
 import type { EngineEvent, EngineMethod, EngineMethods, EngineRequest, EngineResponse } from './protocol'
 
 type Librarian = typeof import('@autorag/librarian') & typeof import('@autorag/librarian/core')
@@ -132,6 +133,34 @@ async function search(params: EngineMethods['search']['params']): Promise<Search
     unsearched: unsearched.map((surface) => surface.surface),
     stale: false
   }
+}
+
+/** Collects the user's own promises by searching for commitment phrases and filtering by rules. */
+async function promises({ myNames }: { myNames: string[] }): Promise<Omit<PromiseItem, 'status'>[]> {
+  const runtime = requireLite()
+  const found = new Map<string, Omit<PromiseItem, 'status'>>()
+  const seen = new Set<string>()
+  for (const query of PROMISE_QUERIES) {
+    const { results } = await runtime.searchSelected(query, undefined, { topK: 60 })
+    for (const result of results as RawResult[]) {
+      const hit = toSearchHit(result, myNames)
+      if (!hit.isMe || seen.has(hit.id)) continue
+      seen.add(hit.id)
+      // A chat chunk can hold several lines and several promises; keep each one separately.
+      // The line number keeps ids stable, so each promise is completed or dismissed on its own.
+      hit.text.split(/\n+/).forEach((line, index) => {
+        if (!isPromise(line)) return
+        const due = extractDue(line, hit.time ? new Date(hit.time) : new Date())
+        const id = `${hit.id}#${index}`
+        found.set(id, {
+          id,
+          hit: { ...hit, text: line.trim() },
+          ...(due ? { due: due.toISOString() } : {})
+        })
+      })
+    }
+  }
+  return [...found.values()]
 }
 
 function answerError(error: unknown, signedIn: boolean): AnswerEvent {
@@ -269,6 +298,7 @@ const handlers: {
     answers.get(requestId)?.abort()
     answers.delete(requestId)
   },
+  promises,
   probeSources,
   authStatus: async () => (await getAuth()).status(),
   login: async () => (await getAuth()).login(),

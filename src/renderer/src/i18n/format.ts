@@ -20,6 +20,13 @@ export function formatDateTime(value: string | number | Date): string {
   }).format(new Date(value))
 }
 
+/** "21:14" */
+export function formatTime(value: string | number | Date): string {
+  return new Intl.DateTimeFormat(locale(), { hour: '2-digit', minute: '2-digit', hour12: false }).format(
+    new Date(value)
+  )
+}
+
 /** "2 min ago" / "2분 전" / "2 分前" */
 export function formatRelative(value: string | number | Date, now = Date.now()): string {
   const seconds = Math.round((new Date(value).getTime() - now) / 1000)

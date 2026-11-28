@@ -8,6 +8,7 @@ import { SourceIcon } from '@/components/ui/SourceIcon'
 import { formatRelative } from '@/i18n/format'
 import { useEngine } from '@/stores/engine'
 import { useNavigation, type Route } from '@/stores/navigation'
+import { openPromiseCount, usePromises } from '@/stores/promises'
 import { useSettings } from '@/stores/settings'
 
 interface NavItemProps {
@@ -80,6 +81,7 @@ export function Sidebar(): React.JSX.Element {
   const go = useNavigation((state) => state.go)
   const isMac = window.quoba.platform === 'darwin'
   const connected = SOURCES.filter((source) => settings?.sources[source.id]?.enabled)
+  const openPromises = usePromises((state) => openPromiseCount(state.items))
 
   return (
     <aside
@@ -93,7 +95,12 @@ export function Sidebar(): React.JSX.Element {
 
       <nav aria-label={t('nav.label')} className="flex flex-col gap-px">
         <NavItem route="search" icon={Search} label={t('nav.search')} hint={isMac ? '⌘K' : 'Ctrl K'} />
-        <NavItem route="promises" icon={CircleCheck} label={t('nav.promises')} />
+        <NavItem
+          route="promises"
+          icon={CircleCheck}
+          label={t('nav.promises')}
+          hint={openPromises > 0 ? openPromises : undefined}
+        />
         <NavItem route="timeline" icon={Waypoints} label={t('nav.timeline')} />
       </nav>
 

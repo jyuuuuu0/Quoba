@@ -87,3 +87,14 @@ export interface SourceProbe {
   /** What the user has to do next, in plain words from AutoRAG. */
   detail?: string
 }
+
+export type PromiseStatus = 'open' | 'done' | 'dismissed'
+
+/** Something the user said they would do, found in their own messages. */
+export interface PromiseItem {
+  id: string
+  hit: SearchHit
+  /** ISO date of the deadline the user mentioned. */
+  due?: string
+  status: PromiseStatus
+}

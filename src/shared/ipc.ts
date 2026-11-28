@@ -2,6 +2,8 @@ import type {
   AnswerEvent,
   AuthStatus,
   EngineStatus,
+  PromiseItem,
+  PromiseStatus,
   SearchRequest,
   SearchResponse,
   SourceProbe
@@ -17,6 +19,8 @@ export interface QuobaInvoke {
   'search:run': { params: SearchRequest; result: SearchResponse }
   'answer:start': { params: SearchRequest; result: { requestId: string } }
   'answer:cancel': { params: { requestId: string }; result: void }
+  'promises:list': { params: void; result: PromiseItem[] }
+  'promises:setStatus': { params: { id: string; status: PromiseStatus }; result: void }
   'sources:probe': { params: void; result: SourceProbe[] }
   'sources:pickFolder': { params: void; result: string | null }
   'sources:setToken': { params: { sourceId: 'github'; token: string | null }; result: void }
