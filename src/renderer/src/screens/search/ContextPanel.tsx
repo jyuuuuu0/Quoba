@@ -9,7 +9,7 @@ import { useSearch } from '@/stores/search'
 export function ContextPanel(): React.JSX.Element {
   const { t } = useTranslation()
   const selection = useSearch((state) => state.selection)
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState<'idle' | 'done' | 'failed'>('idle')
 
   if (!selection) {
     return (
@@ -72,13 +72,22 @@ export function ContextPanel(): React.JSX.Element {
           size="sm"
           className="flex-1"
           onClick={async () => {
-            await navigator.clipboard.writeText(detail.text)
-            setCopied(true)
-            setTimeout(() => setCopied(false), 1500)
+            try {
+              await navigator.clipboard.writeText(detail.text)
+              setCopied('done')
+            } catch {
+              // Clipboard access can be denied; say so instead of doing nothing.
+              setCopied('failed')
+            }
+            setTimeout(() => setCopied('idle'), 1500)
           }}
         >
           <Copy aria-hidden="true" size={13} />
-          {copied ? t('context.copied') : t('context.copy')}
+          {copied === 'done'
+            ? t('context.copied')
+            : copied === 'failed'
+              ? t('context.copyFailed')
+              : t('context.copy')}
         </Button>
       </div>
     </aside>

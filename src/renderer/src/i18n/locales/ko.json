@@ -154,6 +154,7 @@
     "empty": "결과를 선택하면 여기에 보여요.",
     "copy": "복사",
     "copied": "복사됨",
+    "copyFailed": "복사하지 못했어요",
     "toggle": "맥락 패널 열기/닫기"
   },
   "promises": {
