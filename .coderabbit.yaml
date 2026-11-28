@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: ko-KR
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+    # PR을 기능 브랜치 위에 쌓아 올리므로 모든 base 브랜치를 리뷰
+    base_branches: ['.*']
+  path_filters:
+    - '!package-lock.json'
+    - '!resources/brand/**'
+    - '!eval/data/**'
+  path_instructions:
+    - path: 'src/main/**'
+      instructions: 'IPC 입력이 zod로 검증되는지, 토큰이 로그나 렌더러로 새지 않는지 확인하세요.'
+    - path: 'src/engine/**'
+      instructions: '대화 원문이 외부로 전송되거나 로그로 남지 않는지, 메인 프로세스를 막는 작업이 없는지 확인하세요.'
+    - path: 'src/renderer/**'
+      instructions: '화면 문자열은 t()를 쓰고 en/ko/ja 키가 모두 있는지, 색은 styles.css 토큰을 쓰는지 확인하세요.'
+chat:
+  auto_reply: true
