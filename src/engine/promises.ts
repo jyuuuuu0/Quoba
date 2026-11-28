@@ -26,10 +26,13 @@ const JONGSEONG_RIEUL = 8
 
 /**
  * Korean future-intent endings on any verb: 찍을게요, 갈게, 만들게요. The syllable before 게 is 을
- * or ends in ㄹ, which leaves out adverbs such as 그렇게 or 쉽게.
+ * or ends in ㄹ, which leaves out adverbs such as 그렇게 or 쉽게. The ending must also close the
+ * clause, which leaves out 길게 이어졌어요 or 알게 됐어요 where 게 is followed by another word.
  */
+const INTENT_ENDING = /([가-힣])게(요)?(?=\s*(?:$|[.!~…,;()\]ㅋㅎㅠㅜ^]|\p{Extended_Pictographic}))/gu
+
 function hasKoreanIntentEnding(sentence: string): boolean {
-  for (const match of sentence.matchAll(/([가-힣])게(요)?(?![가-힣])/g)) {
+  for (const match of sentence.matchAll(INTENT_ENDING)) {
     const syllable = match[1]!
     if (syllable === '을') return true
     const code = syllable.charCodeAt(0) - HANGUL_BASE

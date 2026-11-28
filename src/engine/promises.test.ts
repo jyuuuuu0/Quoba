@@ -28,6 +28,20 @@ describe('isPromise', () => {
   ])('rejects a question or request: %s', (text) => {
     expect(isPromise(text)).toBe(false)
   })
+
+  it.each(['내일 갈게!', '그건 제가 정리할게 ㅎㅎ', '자료 올릴게요.'])(
+    'accepts a clause-final intent ending: %s',
+    (text) => {
+      expect(isPromise(text)).toBe(true)
+    }
+  )
+
+  it.each(['회의가 길게 이어졌어요', '그 얘기는 나중에 알게 됐어요', '거리가 멀게 느껴져요'])(
+    'rejects ㄹ+게 that is not an intent ending: %s',
+    (text) => {
+      expect(isPromise(text)).toBe(false)
+    }
+  )
 })
 
 describe('extractDue', () => {
