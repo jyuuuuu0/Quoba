@@ -21,11 +21,14 @@ export class PromiseStore {
   }
 
   set(id: string, status: PromiseStatus): void {
-    if (status === 'open') delete this.statuses[id]
-    else this.statuses[id] = status
+    const next = { ...this.statuses }
+    if (status === 'open') delete next[id]
+    else next[id] = status
+    // Write first: memory only changes once the file holds the new status.
     mkdirSync(dirname(this.path), { recursive: true })
     const temp = `${this.path}.tmp`
-    writeFileSync(temp, JSON.stringify(this.statuses))
+    writeFileSync(temp, JSON.stringify(next))
     renameSync(temp, this.path)
+    this.statuses = next
   }
 }
