@@ -1,0 +1,17 @@
+have_fun: false
+code_review:
+  disable: false
+  # LOW(사소한 취향 차이)는 빼고 MEDIUM 이상만 댓글
+  comment_severity_threshold: MEDIUM
+  max_review_comments: -1
+  pull_request_opened:
+    help: false
+    summary: true
+    code_review: true
+    include_drafts: false
+ignore_patterns:
+  - package-lock.json
+  - resources/brand/**
+  - eval/data/**
+  - out/**
+  - dist/**
