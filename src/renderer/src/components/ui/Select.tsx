@@ -7,8 +7,15 @@ export interface SelectOption {
   label: string
 }
 
-export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
+export interface SelectProps extends Omit<
+  SelectHTMLAttributes<HTMLSelectElement>,
+  'onChange' | 'multiple' | 'value' | 'defaultValue'
+> {
   options: SelectOption[]
+  value?: string
+  defaultValue?: string
+  /** Single selection only: `onChange` receives one value. */
+  multiple?: false
   onChange: (value: string) => void
 }
 

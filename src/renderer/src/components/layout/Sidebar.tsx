@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import { useEffect, useState } from 'react'
 import { CircleCheck, Plus, Search, Settings, Waypoints } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { SOURCES } from '@shared/sources'
@@ -36,9 +37,19 @@ function NavItem({ route, icon: Icon, label, hint }: NavItemProps): React.JSX.El
   )
 }
 
+/** Re-renders every `intervalMs` so relative times such as "2 minutes ago" stay current. */
+function useNow(intervalMs: number): void {
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    const timer = window.setInterval(() => setTick((tick) => tick + 1), intervalMs)
+    return () => window.clearInterval(timer)
+  }, [intervalMs])
+}
+
 function IndexStatus(): React.JSX.Element {
   const { t } = useTranslation()
   const status = useEngine((state) => state.status)
+  useNow(30_000)
   let dot = 'bg-mint'
   let label: string = t('status.upToDate')
   if (status.state === 'indexing') {

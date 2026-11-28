@@ -11,7 +11,7 @@ import type { AnswerEvent, EngineStatus, SearchResponse, SourceProbe } from '@sh
 import type { Settings } from '@shared/settings'
 import { isSourceId } from '@shared/sources'
 import { DazziAuth } from './auth'
-import { buildDatasources, buildProbeDatasources, buildSearchPaths } from './config'
+import { buildDatasources, buildProbeDatasources, buildSearchPaths, narrowToSources } from './config'
 import { toCitation, toSearchHit, type RawAnswerResult, type RawResult } from './normalize'
 import type { EngineEvent, EngineMethod, EngineMethods, EngineRequest, EngineResponse } from './protocol'
 
@@ -27,7 +27,7 @@ let librarianPromise: Promise<Librarian> | undefined
 let lite: Lite | undefined
 let settings: Settings | undefined
 let status: EngineStatus = { state: 'starting' }
-let auth: DazziAuth | undefined
+let authPromise: Promise<DazziAuth> | undefined
 const answers = new Map<string, AbortController>()
 
 function librarian(): Promise<Librarian> {
@@ -47,9 +47,15 @@ function setStatus(next: EngineStatus): EngineStatus {
   return status
 }
 
-async function getAuth(): Promise<DazziAuth> {
-  auth ??= await DazziAuth.create((url) => emit({ kind: 'event', event: 'open-url', data: { url } }))
-  return auth
+/** Concurrent callers share one instance, so a cancel reaches the sign-in it targets. */
+function getAuth(): Promise<DazziAuth> {
+  authPromise ??= DazziAuth.create((url) => emit({ kind: 'event', event: 'open-url', data: { url } })).catch(
+    (error: unknown) => {
+      authPromise = undefined
+      throw error
+    }
+  )
+  return authPromise
 }
 
 /** Writes AutoRAG's config from Quoba's settings and rebuilds the model-free runtime. */
@@ -132,12 +138,22 @@ function answerError(error: unknown, signedIn: boolean): AnswerEvent {
 async function answer(params: EngineMethods['answer']['params']): Promise<void> {
   const send = (event: AnswerEvent): void =>
     emit({ kind: 'event', event: 'answer', data: { requestId: params.requestId, event } })
+  const filters = params.filters ?? {}
+  if (filters.saidByMe) {
+    // The agent cannot restrict evidence by author, so refuse rather than answer from everyone's messages.
+    send({ type: 'error', code: 'unknown', message: 'AI answers do not support the "said by me" filter' })
+    return
+  }
   const abort = new AbortController()
   answers.set(params.requestId, abort)
   const signedIn = (await getAuth()).status().signedIn
   try {
     const lib = await librarian()
-    const config = lib.resolveConfig({ flags: {}, env, cwd: autoragHome })
+    const config = narrowToSources(
+      lib.resolveConfig({ flags: {}, env, cwd: autoragHome }),
+      filters.sources ?? [],
+      join(autoragHome, 'empty')
+    )
     const resolved = await lib.resolveAgentModel(config, { env, cwd: autoragHome })
     const agent = new lib.AutoRAGAgent({
       ...lib.buildAgentOptions(config),
@@ -145,7 +161,6 @@ async function answer(params: EngineMethods['answer']['params']): Promise<void> 
       ...(resolved.apiKey !== undefined ? { apiKey: resolved.apiKey } : {}),
       ...(resolved.providerApiKeys !== undefined ? { providerApiKeys: resolved.providerApiKeys } : {})
     })
-    const filters = params.filters ?? {}
     const stream = agent.searchDocumentsStream(params.query, {
       signal: abort.signal,
       ...(filters.since ? { since: Date.parse(filters.since) } : {}),
