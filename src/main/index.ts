@@ -59,7 +59,9 @@ app.whenReady().then(async () => {
     engine,
     secrets,
     onSettingsChanged: () => {
-      void engine.request('configure', { settings: store.get() })
+      engine
+        .request('configure', { settings: store.get() })
+        .catch((error: unknown) => console.error('Engine reconfiguration failed', error))
     }
   })
 
@@ -72,7 +74,9 @@ app.whenReady().then(async () => {
 
   try {
     await engine.request('configure', { settings: store.get() })
-    if (store.get().onboarded) void engine.request('refresh', {})
+    if (store.get().onboarded) {
+      engine.request('refresh', {}).catch((error: unknown) => console.error('Startup refresh failed', error))
+    }
   } catch (error) {
     // The engine reports its own status; the window stays usable and settings can retry.
     console.error('Engine configuration failed', error)
