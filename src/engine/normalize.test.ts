@@ -26,6 +26,20 @@ describe('isMyName', () => {
 })
 
 describe('toSearchHit', () => {
+  it('reads the modified time AutoRAG stores for local files', () => {
+    const hit = toSearchHit(
+      {
+        id: 'f1',
+        content: 'notes',
+        source: '/docs/a.md',
+        score: 1,
+        metadata: { sourceMtimeMs: 1764201600000 }
+      },
+      []
+    )
+    expect(hit.time).toBe(new Date(1764201600000).toISOString())
+  })
+
   it('normalizes a Discord message', () => {
     const hit = toSearchHit(
       {

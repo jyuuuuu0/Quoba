@@ -63,15 +63,20 @@ app.whenReady().then(async () => {
     }
   })
 
-  mainWindow = createMainWindow()
-
-  await engine.request('configure', { settings: store.get() })
-  if (store.get().onboarded) void engine.request('refresh', {})
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) mainWindow = createMainWindow()
   })
   app.on('before-quit', () => engine.stop())
+
+  mainWindow = createMainWindow()
+
+  try {
+    await engine.request('configure', { settings: store.get() })
+    if (store.get().onboarded) void engine.request('refresh', {})
+  } catch (error) {
+    // The engine reports its own status; the window stays usable and settings can retry.
+    console.error('Engine configuration failed', error)
+  }
 })
 
 app.on('window-all-closed', () => {

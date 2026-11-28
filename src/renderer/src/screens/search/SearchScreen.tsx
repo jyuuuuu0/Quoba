@@ -58,7 +58,13 @@ function Body(): React.JSX.Element {
   if (loading) return <Spinner label={t('common.loading')} className="mt-6" />
   if (error) return <p className="mt-6 text-fg-muted">{t('search.failed')}</p>
   if (!query) return <Suggestions />
-  if (hits.length === 0) return <p className="mt-6 text-fg-muted">{t('search.noResults')}</p>
+  if (hits.length === 0)
+    return (
+      <div className="mt-6 flex flex-col gap-1.5">
+        <p className="m-0 text-fg-muted">{t('search.noResults')}</p>
+        {partial && <p className="m-0 text-xs text-fg-subtle">{t('search.partial')}</p>}
+      </div>
+    )
   return (
     <div className="mt-2 flex flex-col border-t border-line pt-1">
       {partial && <p className="m-0 py-2 text-xs text-fg-subtle">{t('search.partial')}</p>}
