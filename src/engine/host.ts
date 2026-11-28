@@ -80,7 +80,16 @@ function requireLite(): Lite {
   return lite
 }
 
-async function refresh(force = false): Promise<EngineStatus> {
+// Refreshes run one at a time, so an earlier run cannot report `ready` while a later one indexes.
+let refreshQueue: Promise<unknown> = Promise.resolve()
+
+function refresh(force = false): Promise<EngineStatus> {
+  const run = refreshQueue.then(() => runRefresh(force))
+  refreshQueue = run.catch(() => undefined)
+  return run
+}
+
+async function runRefresh(force: boolean): Promise<EngineStatus> {
   const runtime = requireLite()
   setStatus({ ...status, state: 'indexing', progress: undefined, error: undefined })
   try {
@@ -175,8 +184,9 @@ async function answer(params: EngineMethods['answer']['params']): Promise<void> 
   }
   const abort = new AbortController()
   answers.set(params.requestId, abort)
-  const signedIn = (await getAuth()).status().signedIn
+  let signedIn = false
   try {
+    signedIn = (await getAuth()).status().signedIn
     const lib = await librarian()
     const config = narrowToSources(
       lib.resolveConfig({ flags: {}, env, cwd: autoragHome }),
@@ -215,22 +225,32 @@ async function answer(params: EngineMethods['answer']['params']): Promise<void> 
 
 function cliPath(): string {
   const require = createRequire(import.meta.url)
-  return join(dirname(require.resolve('@autorag/librarian/package.json')), 'dist/cli/index.js')
+  // The package does not export ./package.json; its root entry is dist/index.js, next to dist/cli.
+  return join(dirname(require.resolve('@autorag/librarian')), 'cli/index.js')
 }
+
+/** `autorag setup` checks external CLIs; a stuck check must not hang the probe forever. */
+const CLI_TIMEOUT_MS = 60_000
 
 function runCli(args: string[], extraEnv: NodeJS.ProcessEnv): Promise<string> {
   return new Promise((resolve, reject) => {
     // The Electron binary runs as plain Node with ELECTRON_RUN_AS_NODE.
     const child = spawn(process.execPath, [cliPath(), ...args], {
       env: { ...env, ...extraEnv, ELECTRON_RUN_AS_NODE: '1' },
-      stdio: ['ignore', 'pipe', 'pipe']
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: CLI_TIMEOUT_MS
     })
     let stdout = ''
     let stderr = ''
     child.stdout.on('data', (chunk: Buffer) => (stdout += chunk.toString()))
     child.stderr.on('data', (chunk: Buffer) => (stderr += chunk.toString()))
     child.on('error', reject)
-    child.on('close', (code) => (code === 0 ? resolve(stdout) : reject(new Error(stderr || `exit ${code}`))))
+    child.on('close', (code, signal) => {
+      if (code === 0) resolve(stdout)
+      else if (signal)
+        reject(new Error(`autorag ${args[0]} stopped (${signal}), possibly after ${CLI_TIMEOUT_MS} ms`))
+      else reject(new Error(stderr || `exit ${code}`))
+    })
   })
 }
 
@@ -271,7 +291,8 @@ const handlers: {
   status: async () => status,
   search,
   answer: async (params) => {
-    void answer(params)
+    // answer() reports its own failures as events; never let one escape as an unhandled rejection.
+    answer(params).catch((error: unknown) => console.error('Answer failed', error))
   },
   cancelAnswer: async ({ requestId }) => {
     answers.get(requestId)?.abort()
