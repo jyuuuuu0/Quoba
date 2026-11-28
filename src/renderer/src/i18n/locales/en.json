@@ -233,5 +233,27 @@
       "ai": "When you get an AI answer, the few excerpts relevant to your question are sent to the AI model to write it. Search results alone never leave your computer.",
       "tokens": "Access tokens are encrypted with your system keychain."
     }
+  },
+  "onboarding": {
+    "progress": "Setup progress",
+    "skip": "Skip",
+    "start": "Start searching",
+    "welcome": {
+      "title": "Everything you said, in one place",
+      "body": "Quoba searches your chats, mail, notes and files at once, and shows exactly where something was said."
+    },
+    "names": {
+      "title": "What do people call you?",
+      "body": "Add the names you appear as in chats. Quoba uses them to find what you said and what you promised."
+    },
+    "sources": {
+      "title": "Connect your places",
+      "body": "Turn on what you want to search. You can change this any time in Sources."
+    },
+    "ai": {
+      "title": "Get answers, not just results",
+      "body": "Sign in once in your browser to get AI answers with sources and automatic promises. No API key needed. You can skip this; search works without it.",
+      "signIn": "Sign in with Dazzi"
+    }
   }
 }
