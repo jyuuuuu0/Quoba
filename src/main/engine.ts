@@ -19,6 +19,8 @@ export class EngineClient {
   private child?: UtilityProcess
   private nextId = 1
   private readonly pending = new Map<number, Pending>()
+  private readonly exited = new WeakSet<UtilityProcess>()
+  private restarting: Promise<void> = Promise.resolve()
 
   constructor(private readonly listeners: EngineListeners) {}
 
@@ -39,17 +41,38 @@ export class EngineClient {
         this.pending.delete(id)
         pending.reject(new Error(`Engine exited (${code})`))
       }
-      if (this.child === child) this.child = undefined
+      this.exited.add(child)
+      // Only the current engine dying is news; an engine replaced by a restart exits on purpose.
+      if (this.child === child) {
+        this.child = undefined
+        this.listeners.onStatus({ state: 'error', error: `Engine exited (${code})` })
+      }
     })
     this.child = child
   }
 
   /** Restarts the engine, for example after a token changes its environment. */
-  async restart(extraEnv: Record<string, string>): Promise<void> {
-    this.child?.kill()
-    this.child = undefined
-    // Replace, not merge: a cleared token must not survive in the new process.
-    this.start(extraEnv)
+  restart(extraEnv: Record<string, string>): Promise<void> {
+    // One restart at a time, and each waits for the old engine to exit, so engines never pile up.
+    const run = this.restarting.then(async () => {
+      const old = this.child
+      this.child = undefined
+      if (old) await this.terminate(old)
+      // Replace, not merge: a cleared token must not survive in the new process.
+      this.start(extraEnv)
+    })
+    this.restarting = run.catch(() => undefined)
+    return run
+  }
+
+  /** Kills a child and resolves once it has exited. A child still launching is killed once it spawns. */
+  private terminate(child: UtilityProcess): Promise<void> {
+    if (this.exited.has(child)) return Promise.resolve()
+    return new Promise((resolve) => {
+      child.once('exit', () => resolve())
+      if (child.pid === undefined) child.once('spawn', () => child.kill())
+      else child.kill()
+    })
   }
 
   request<M extends EngineMethod>(
