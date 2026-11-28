@@ -13,26 +13,38 @@ interface EngineState {
   signOut: () => Promise<void>
 }
 
+// Bumped by every `engine:status` event, so a snapshot fetched earlier cannot overwrite it.
+let statusVersion = 0
+// Only the latest sign-in attempt may clear `signingIn`.
+let signInAttempt = 0
+
 export const useEngine = create<EngineState>((set) => ({
   status: { state: 'starting' },
   auth: { provider: 'dazzi', signedIn: false },
   signingIn: false,
   load: async () => {
-    const [status, auth] = await Promise.all([api.invoke('engine:status'), api.invoke('auth:status')])
-    set({ status, auth })
+    const version = statusVersion
+    await Promise.all([
+      api.invoke('engine:status').then((status) => {
+        if (version === statusVersion) set({ status })
+      }),
+      api.invoke('auth:status').then((auth) => set({ auth }))
+    ])
   },
   refresh: async (force) => {
     set({ status: await api.invoke('engine:refresh', { force }) })
   },
   signIn: async () => {
+    const attempt = ++signInAttempt
     set({ signingIn: true })
     try {
       set({ auth: await api.invoke('auth:login') })
     } finally {
-      set({ signingIn: false })
+      if (attempt === signInAttempt) set({ signingIn: false })
     }
   },
   cancelSignIn: async () => {
+    signInAttempt++
     await api.invoke('auth:cancel')
     set({ signingIn: false })
   },
@@ -41,4 +53,7 @@ export const useEngine = create<EngineState>((set) => ({
   }
 }))
 
-api.on('engine:status', (status) => useEngine.setState({ status }))
+api.on('engine:status', (status) => {
+  statusVersion++
+  useEngine.setState({ status })
+})
