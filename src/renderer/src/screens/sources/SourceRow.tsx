@@ -207,7 +207,12 @@ export function SourceRow({ source }: { source: SourceDefinition }): React.JSX.E
   const enabled = options?.enabled === true
 
   const needsTool = source.setup === 'cli' && probe?.state === 'missing-tool'
+  // The tool is installed but still needs a step of its own (for example signing in).
+  const needsSetup = source.setup === 'cli' && probe?.state === 'needs-setup'
   const hasFields = source.setup !== 'cli' || source.id === 'mail'
+  // Folder, repo and feed sources can be switched off without losing what was entered.
+  const hasConfig =
+    (options?.paths?.length ?? 0) + (options?.repos?.length ?? 0) + (options?.feeds?.length ?? 0) > 0
   let badge: React.ReactNode = null
   // A failed check wins over "enabled": the switch only says the source is selected, not that it works.
   if (needsTool) badge = <Badge tone="warn">{t('sources.state.needsTool', { tool: source.cli })}</Badge>
@@ -227,14 +232,14 @@ export function SourceRow({ source }: { source: SourceDefinition }): React.JSX.E
           </span>
           <span className="truncate text-sm text-fg-subtle">{t(`sources.about.${source.id}`)}</span>
         </div>
-        {(hasFields || needsTool) && (
+        {(hasFields || needsTool || needsSetup) && (
           <button
             type="button"
             aria-expanded={open}
             onClick={() => setOpen(!open)}
             className="flex items-center gap-1 rounded-control px-2 py-1 text-sm text-fg-muted hover:bg-hover hover:text-fg"
           >
-            {needsTool ? t('sources.howToConnect') : t('sources.configure')}
+            {needsTool || needsSetup ? t('sources.howToConnect') : t('sources.configure')}
             <ChevronDown
               aria-hidden="true"
               size={13}
@@ -242,7 +247,7 @@ export function SourceRow({ source }: { source: SourceDefinition }): React.JSX.E
             />
           </button>
         )}
-        {source.setup === 'cli' && (
+        {(source.setup === 'cli' || hasConfig) && (
           <Switch
             checked={enabled}
             disabled={!enabled && needsTool}
@@ -261,6 +266,12 @@ export function SourceRow({ source }: { source: SourceDefinition }): React.JSX.E
                   npm install -g {source.cliPackage}
                 </code>
               )}
+              {probe?.detail && <p className="m-0 text-xs text-fg-subtle">{probe.detail}</p>}
+            </div>
+          )}
+          {needsSetup && (
+            <div className="flex flex-col gap-1.5 text-sm text-fg-muted">
+              <p className="m-0">{t('sources.setupHelp', { tool: source.cli })}</p>
               {probe?.detail && <p className="m-0 text-xs text-fg-subtle">{probe.detail}</p>}
             </div>
           )}

@@ -49,6 +49,7 @@
     "configure": "설정",
     "howToConnect": "연결 방법",
     "installHelp": "Quoba는 {{tool}}이 저장한 대화 기록을 읽어요. {{tool}}을 설치하고 한 번 로그인한 뒤 다시 확인을 눌러 주세요.",
+    "setupHelp": "{{tool}}은 설치되어 있지만 아직 설정이 끝나지 않았어요. 아래 안내를 마친 뒤 \"다시 확인\"을 눌러 주세요.",
     "toggle": "{{name}} 검색하기",
     "removeFolder": "폴더 제거",
     "chooseFolder": "폴더 선택",
