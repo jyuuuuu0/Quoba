@@ -48,7 +48,8 @@ function FolderList({
   multiple
 }: {
   paths: string[]
-  onChange: (paths: string[]) => void
+  /** Receives an update that is applied to the latest saved list, not the one shown at click time. */
+  onChange: (update: (paths: string[]) => string[]) => void
   multiple: boolean
 }): React.JSX.Element {
   const { t } = useTranslation()
@@ -63,7 +64,7 @@ function FolderList({
           <button
             type="button"
             aria-label={t('sources.removeFolder')}
-            onClick={() => onChange(paths.filter((item) => item !== path))}
+            onClick={() => onChange((current) => current.filter((item) => item !== path))}
             className="text-fg-subtle hover:text-fg"
           >
             <X aria-hidden="true" size={13} />
@@ -76,7 +77,10 @@ function FolderList({
           className="self-start"
           onClick={async () => {
             const folder = await pickFolder()
-            if (folder && !paths.includes(folder)) onChange(multiple ? [...paths, folder] : [folder])
+            if (!folder) return
+            onChange((current) =>
+              current.includes(folder) ? current : multiple ? [...current, folder] : [folder]
+            )
           }}
         >
           <FolderPlus aria-hidden="true" size={13} />
@@ -105,7 +109,12 @@ function SetupFields({ source }: { source: SourceDefinition }): React.JSX.Elemen
         <FolderList
           multiple={source.id === 'files'}
           paths={options.paths ?? []}
-          onChange={(paths) => void save(source.id, { paths, enabled: paths.length > 0 })}
+          onChange={(update) =>
+            void save(source.id, (current) => {
+              const paths = update(current.paths ?? [])
+              return { paths, enabled: paths.length > 0 }
+            })
+          }
         />
       )
     case 'github':
@@ -200,9 +209,11 @@ export function SourceRow({ source }: { source: SourceDefinition }): React.JSX.E
   const needsTool = source.setup === 'cli' && probe?.state === 'missing-tool'
   const hasFields = source.setup !== 'cli' || source.id === 'mail'
   let badge: React.ReactNode = null
-  if (enabled) badge = <Badge tone="good">{t('sources.state.connected')}</Badge>
-  else if (needsTool) badge = <Badge tone="warn">{t('sources.state.needsTool', { tool: source.cli })}</Badge>
-  else if (probe?.state === 'error') badge = <Badge tone="warn">{t('sources.state.error')}</Badge>
+  // A failed check wins over "enabled": the switch only says the source is selected, not that it works.
+  if (needsTool) badge = <Badge tone="warn">{t('sources.state.needsTool', { tool: source.cli })}</Badge>
+  else if (probe?.state === 'error' || probe?.state === 'needs-setup')
+    badge = <Badge tone="warn">{t('sources.state.error')}</Badge>
+  else if (enabled) badge = <Badge tone="good">{t('sources.state.connected')}</Badge>
   else if (probe?.state === 'ready') badge = <Badge tone="muted">{t('sources.state.ready')}</Badge>
 
   return (

@@ -57,6 +57,8 @@ export class DazziAuth {
         },
         { baseUrl: resolveBaseUrl(process.env) }
       )
+      // A logout or a newer sign-in may have cancelled this one while the browser was open.
+      if (abort.signal.aborted || this.abort !== abort) throw new Error('Sign-in cancelled')
       this.write({
         type: 'oauth',
         access: credentials.access,
@@ -76,6 +78,8 @@ export class DazziAuth {
   }
 
   logout(): AuthStatus {
+    // Stop a pending sign-in so it cannot write a credential back after logout.
+    this.cancel()
     const data = this.read()
     delete data[PROVIDER_ID]
     this.save(data)

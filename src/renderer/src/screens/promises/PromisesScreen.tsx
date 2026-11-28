@@ -14,12 +14,20 @@ import { useSettings } from '@/stores/settings'
 
 type Group = 'overdue' | 'thisWeek' | 'later' | 'noDate' | 'done'
 
+/** Start of next Monday in local time: the end of the current calendar week. */
+function endOfWeek(now: number): number {
+  const date = new Date(now)
+  date.setHours(0, 0, 0, 0)
+  date.setDate(date.getDate() + ((8 - date.getDay()) % 7 || 7))
+  return date.getTime()
+}
+
 function groupOf(item: PromiseItem, now: number): Group {
   if (item.status === 'done') return 'done'
   if (!item.due) return 'noDate'
   const due = Date.parse(item.due)
   if (due < now) return 'overdue'
-  return due - now <= 7 * 86_400_000 ? 'thisWeek' : 'later'
+  return due < endOfWeek(now) ? 'thisWeek' : 'later'
 }
 
 function PromiseRow({ item }: { item: PromiseItem }): React.JSX.Element {

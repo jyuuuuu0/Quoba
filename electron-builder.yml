@@ -21,7 +21,11 @@ mac:
   target:
     - target: dmg
       arch: [arm64, x64]
-  hardenedRuntime: true
+  # 인증서가 없어서 ad-hoc 서명. Apple silicon은 서명 없는 앱을 실행하지 않는다.
+  # hardened runtime은 ad-hoc 서명과 함께 쓰면 Electron 프레임워크 로딩이 막히므로 끈다.
+  # Developer ID 인증서를 쓰게 되면 identity를 지우고 hardenedRuntime을 다시 켠다.
+  identity: '-'
+  hardenedRuntime: false
 dmg:
   artifactName: ${productName}-${version}-${arch}.${ext}
 win:
