@@ -38,7 +38,61 @@
   },
   "sources": {
     "add": "ソースを追加",
-    "emptySidebar": "チャット、メール、ファイルを接続"
+    "emptySidebar": "チャット、メール、ファイルを接続",
+    "intro": "Quobaが探す場所を選んでください。すべてこのコンピューター上で読み込み、インデックスします。",
+    "checkAgain": "再確認",
+    "checking": "ソースを確認中",
+    "probeFailed": "ソースを確認できませんでした。「再確認」を押してやり直してください。",
+    "indexNow": "今すぐインデックス",
+    "showMore": "他のソースを表示",
+    "privacy": "チャット、メール、ファイルがこのコンピューターの外に出ることはありません。AI回答を求めたときだけ、関連する一部の文章がAIモデルに送信されます。",
+    "configure": "設定",
+    "howToConnect": "接続方法",
+    "installHelp": "Quobaは{{tool}}が保存した履歴を読み込みます。{{tool}}をインストールして一度サインインし、「再確認」を押してください。",
+    "toggle": "{{name}}を検索",
+    "removeFolder": "フォルダを削除",
+    "chooseFolder": "フォルダを選択",
+    "state": {
+      "connected": "接続済み",
+      "ready": "接続可能",
+      "needsTool": "{{tool}}が必要",
+      "error": "接続できません"
+    },
+    "groups": {
+      "chat": "チャット",
+      "mail": "メール",
+      "notes": "ノート",
+      "files": "ファイル",
+      "code": "コード",
+      "web": "ウェブ"
+    },
+    "about": {
+      "kakaotalk": "このコンピューターのチャットルーム",
+      "discord": "Discordアプリのサーバーと DM",
+      "slack": "ワークスペースとチャンネル",
+      "telegram": "チャットとグループ",
+      "whatsapp": "WhatsAppデスクトップのチャット",
+      "mail": "Gmail、IMAP、保存済みの .eml/.mbox",
+      "notion": "ワークスペースのページ",
+      "obsidian": "Vaultフォルダ",
+      "github": "Issue、プルリクエスト、コメント",
+      "files": "選んだフォルダの文書、PDF、スライド、HWP",
+      "rss": "フォロー中のフィードの記事",
+      "lark": "Larkのチャットとドキュメント",
+      "browser": "閲覧したページ（Histerが必要）"
+    },
+    "github": {
+      "token": "GitHubアクセストークン",
+      "tokenPlaceholder": "アクセストークン（システムのキーチェーンに保存）",
+      "repos": "リポジトリ"
+    },
+    "rss": {
+      "feeds": "フィードURL（1行に1つ）"
+    },
+    "mail": {
+      "account": "メールアカウント",
+      "accountPlaceholder": "mailcrawlで設定したアカウント名"
+    }
   },
   "sourceNames": {
     "kakaotalk": "カカオトーク",
