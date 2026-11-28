@@ -15,6 +15,7 @@ export function SourcesScreen(): React.JSX.Element {
   const { t } = useTranslation()
   const probe = useSources((state) => state.probe)
   const probing = useSources((state) => state.probing)
+  const probeFailed = useSources((state) => state.probeFailed)
   const status = useEngine((state) => state.status)
   const refresh = useEngine((state) => state.refresh)
   const [showMore, setShowMore] = useState(false)
@@ -48,6 +49,11 @@ export function SourcesScreen(): React.JSX.Element {
       <main className="scroll-thin flex-1 overflow-y-auto px-10 py-8">
         <div className="mx-auto flex max-w-[720px] flex-col gap-8">
           <p className="m-0 text-fg-muted">{t('sources.intro')}</p>
+          {probeFailed && (
+            <p role="alert" className="m-0 text-sm text-fg-subtle">
+              {t('sources.probeFailed')}
+            </p>
+          )}
           {GROUPS.map((group) => {
             const items = visible.filter((source) => source.kind === group)
             if (items.length === 0) return null

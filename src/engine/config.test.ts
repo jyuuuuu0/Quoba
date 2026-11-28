@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { defaultSettings } from '@shared/settings'
-import { buildDatasources, buildProbeDatasources, buildSearchPaths } from './config'
+import { buildDatasources, buildProbeDatasources, buildSearchPaths, narrowToSources } from './config'
 
 describe('buildDatasources', () => {
   it('writes only enabled, fully configured sources with their AutoRAG template', () => {
@@ -46,5 +46,25 @@ describe('buildProbeDatasources', () => {
     expect(Object.keys(buildProbeDatasources())).toEqual(
       expect.arrayContaining(['kakaotalk', 'discord', 'slack', 'telegram', 'whatsapp', 'mail', 'notion'])
     )
+  })
+})
+
+describe('narrowToSources', () => {
+  const config = { searchPaths: ['/docs'], datasources: { kakao: {}, discord: {}, slack: {} } }
+
+  it('keeps everything when no source is selected', () => {
+    expect(narrowToSources(config, [], '/empty')).toBe(config)
+  })
+
+  it('keeps only the selected chat sources and drops folders', () => {
+    const narrowed = narrowToSources(config, ['discord'], '/empty')
+    expect(Object.keys(narrowed.datasources)).toEqual(['discord'])
+    expect(narrowed.searchPaths).toEqual(['/empty'])
+  })
+
+  it('keeps folders when files is selected', () => {
+    const narrowed = narrowToSources(config, ['files'], '/empty')
+    expect(narrowed.searchPaths).toEqual(['/docs'])
+    expect(narrowed.datasources).toEqual({})
   })
 })

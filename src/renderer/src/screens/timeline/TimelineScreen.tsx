@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { Search } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { SearchHit } from '@shared/engine'
 import { Panel } from '@/components/layout/Panel'
@@ -23,21 +23,26 @@ export function TimelineScreen(): React.JSX.Element {
   const [hits, setHits] = useState<SearchHit[]>([])
   const [loading, setLoading] = useState(false)
   const [failed, setFailed] = useState(false)
+  // Only the latest search may write results; an older, slower response is dropped.
+  const latest = useRef(0)
 
   const run = async (): Promise<void> => {
     const text = query.trim()
     if (!text) return
+    const request = ++latest.current
     setLoading(true)
     setFailed(false)
     setTopic(text)
     try {
       const response = await api.invoke('search:run', { query: text, limit: 120 })
+      if (request !== latest.current) return
       setHits(response.hits.filter((hit) => hit.time).sort((a, b) => a.time!.localeCompare(b.time!)))
     } catch {
+      if (request !== latest.current) return
       setFailed(true)
       setHits([])
     } finally {
-      setLoading(false)
+      if (request === latest.current) setLoading(false)
     }
   }
 

@@ -5,7 +5,7 @@ import { broadcast, registerIpc } from './ipc'
 import { PromiseStore } from './promise-store'
 import { Secrets } from './secrets'
 import { SettingsStore } from './settings-store'
-import { applySystemSettings } from './system'
+import { applyGlobalShortcut, applySystemSettings, setWindowFactory } from './system'
 
 let mainWindow: BrowserWindow | undefined
 
@@ -61,22 +61,29 @@ app.whenReady().then(async () => {
     engine,
     secrets,
     promises: new PromiseStore(),
+    registerGlobalShortcut: applyGlobalShortcut,
     onSettingsChanged: () => {
       applySystemSettings(store.get())
       void engine.request('configure', { settings: store.get() })
     }
   })
 
-  mainWindow = createMainWindow()
-  applySystemSettings(store.get())
-
-  await engine.request('configure', { settings: store.get() })
-  if (store.get().onboarded) void engine.request('refresh', {})
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) mainWindow = createMainWindow()
   })
   app.on('before-quit', () => engine.stop())
+
+  setWindowFactory(() => (mainWindow = createMainWindow()))
+  mainWindow = createMainWindow()
+  applySystemSettings(store.get())
+
+  try {
+    await engine.request('configure', { settings: store.get() })
+    if (store.get().onboarded) void engine.request('refresh', {})
+  } catch (error) {
+    // The engine reports its own status; the window stays usable and settings can retry.
+    console.error('Engine configuration failed', error)
+  }
 })
 
 app.on('window-all-closed', () => {

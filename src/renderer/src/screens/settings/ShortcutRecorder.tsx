@@ -5,11 +5,15 @@ import { eventToAccelerator } from '@/lib/shortcuts'
 
 export interface ShortcutRecorderProps {
   value: string | null
-  onChange: (accelerator: string | null) => void
+  /** May reject, for example when another app owns a global shortcut. */
+  onChange: (accelerator: string | null) => void | Promise<void>
   label: string
   /** Accelerators already used elsewhere; recording one of them is refused. */
   taken: string[]
 }
+
+// Only one recorder listens at a time; starting another stops the previous one.
+let stopActiveRecorder: (() => void) | undefined
 
 /** Click, then press keys. Escape cancels, Backspace clears. */
 export function ShortcutRecorder({
@@ -21,15 +25,23 @@ export function ShortcutRecorder({
   const { t } = useTranslation()
   const [recording, setRecording] = useState(false)
   const [conflict, setConflict] = useState(false)
+  const [failed, setFailed] = useState(false)
 
   useEffect(() => {
     if (!recording) return
+    const save = (accelerator: string | null): void => {
+      setFailed(false)
+      Promise.resolve(onChange(accelerator)).catch(() => setFailed(true))
+    }
+    const stop = (): void => setRecording(false)
+    stopActiveRecorder?.()
+    stopActiveRecorder = stop
     const listener = (event: KeyboardEvent): void => {
       event.preventDefault()
       event.stopPropagation()
       if (event.key === 'Escape') return setRecording(false)
       if (event.key === 'Backspace' || event.key === 'Delete') {
-        onChange(null)
+        save(null)
         return setRecording(false)
       }
       const accelerator = eventToAccelerator(event)
@@ -37,16 +49,20 @@ export function ShortcutRecorder({
       if (!accelerator || !accelerator.includes('+')) return
       if (taken.includes(accelerator)) return setConflict(true)
       setConflict(false)
-      onChange(accelerator)
+      save(accelerator)
       setRecording(false)
     }
     window.addEventListener('keydown', listener, { capture: true })
-    return () => window.removeEventListener('keydown', listener, { capture: true })
+    return () => {
+      window.removeEventListener('keydown', listener, { capture: true })
+      if (stopActiveRecorder === stop) stopActiveRecorder = undefined
+    }
   }, [recording, onChange, taken])
 
   return (
     <span className="flex items-center gap-2">
       {conflict && <span className="text-xs text-amber-300/90">{t('settings.shortcuts.taken')}</span>}
+      {failed && <span className="text-xs text-amber-300/90">{t('settings.shortcuts.unavailable')}</span>}
       <button
         type="button"
         aria-label={t('settings.shortcuts.change', { action: label })}
