@@ -12,7 +12,17 @@ export function eventToAccelerator(event: KeyboardEvent): string | null {
   if (isMac() && event.ctrlKey) parts.push('Control')
   if (event.altKey) parts.push('Alt')
   if (event.shiftKey) parts.push('Shift')
-  const named: Record<string, string> = { ' ': 'Space', Enter: 'Enter', Escape: 'Escape', Tab: 'Tab' }
+  // Electron accelerators name arrows Up/Down/Left/Right, not ArrowUp etc.
+  const named: Record<string, string> = {
+    ' ': 'Space',
+    Enter: 'Enter',
+    Escape: 'Escape',
+    Tab: 'Tab',
+    ArrowUp: 'Up',
+    ArrowDown: 'Down',
+    ArrowLeft: 'Left',
+    ArrowRight: 'Right'
+  }
   // event.code keeps the physical key when Alt or Shift changes event.key (e.g. ⌥K on a Mac).
   const fromCode = event.code.startsWith('Key')
     ? event.code.slice(3)

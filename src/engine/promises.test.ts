@@ -10,7 +10,8 @@ describe('isPromise', () => {
     '금요일까지 보내드리겠습니다',
     "I'll send the deck tonight",
     'Leave it to me',
-    '資料は明日送ります'
+    '資料は明日送ります',
+    'それはやっておきます'
   ])('accepts a commitment: %s', (text) => {
     expect(isPromise(text)).toBe(true)
   })
@@ -41,6 +42,12 @@ describe('extractDue', () => {
   it('reads the next weekday, a week ahead when it is today', () => {
     expect(extractDue('월요일까지 보낼게', saidAt)?.getDate()).toBe(23)
     expect(extractDue('금요일까지 보낼게', saidAt)?.getDate()).toBe(27)
+  })
+
+  it('reads a weekday in next week', () => {
+    expect(extractDue('다음 주 월요일까지 보낼게', saidAt)?.getDate()).toBe(23)
+    expect(extractDue("I'll send it next week Wednesday", saidAt)?.getDate()).toBe(25)
+    expect(extractDue('다음 주까지 할게요', saidAt)?.getDate()).toBe(27)
   })
 
   it('reads written dates in each language', () => {

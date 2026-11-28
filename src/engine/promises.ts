@@ -10,7 +10,7 @@ const COMMITMENTS = [
   // English
   /\b(i'?ll|i will|i'?m going to|let me|i can (?:do|take|send|handle|make)|i'?ll take care|leave it to me|on it)\b/i,
   // Japanese: します, やります, 送ります, しておきます, 担当します …
-  /(します|やります|送ります|しておきます|やっておく|担当します|対応します|準備します|確認します|連絡します)/
+  /(します|やります|送ります|しておきます|やっておきます|やっておく|担当します|対応します|準備します|確認します|連絡します)/
 ]
 
 /** Questions and offers to others are not commitments. */
@@ -72,7 +72,13 @@ export function extractDue(text: string, saidAt: Date): Date | undefined {
   if (/오늘|today|今日/i.test(text)) return day(0)
   if (/모레|day after tomorrow|明後日/i.test(text)) return day(2)
   if (/내일|tomorrow|明日/i.test(text)) return day(1)
-  if (/다음\s?주|next week|来週/i.test(text)) return day(7)
+  if (/다음\s?주|next week|来週/i.test(text)) {
+    // "Next week Monday" means that weekday in the following calendar week (weeks start on Monday).
+    const weekday = WEEKDAYS.find(([pattern]) => pattern.test(text))?.[1]
+    if (weekday === undefined) return day(7)
+    const toNextMonday = (8 - saidAt.getDay()) % 7 || 7
+    return day(toNextMonday + ((weekday + 6) % 7))
+  }
 
   // 11월 27일, 11/27, 11月27日, Nov 27
   const numeric = text.match(/(\d{1,2})\s?(?:월|\/|月)\s?(\d{1,2})\s?(?:일|日)?/)
