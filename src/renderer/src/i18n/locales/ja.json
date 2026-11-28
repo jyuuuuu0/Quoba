@@ -19,5 +19,40 @@
   },
   "language": {
     "label": "言語"
+  },
+  "nav": {
+    "label": "メイン",
+    "search": "検索",
+    "promises": "約束",
+    "timeline": "タイムライン",
+    "sources": "ソース",
+    "settings": "設定"
+  },
+  "status": {
+    "upToDate": "最新の状態",
+    "indexing": "インデックス作成中…",
+    "indexingProgress": "インデックス作成中 {{processed}}/{{total}}",
+    "error": "インデックス作成に失敗",
+    "starting": "起動中…",
+    "indexedAt": "{{time}}に更新"
+  },
+  "sources": {
+    "add": "ソースを追加",
+    "emptySidebar": "チャット、メール、ファイルを接続"
+  },
+  "sourceNames": {
+    "kakaotalk": "カカオトーク",
+    "discord": "Discord",
+    "slack": "Slack",
+    "telegram": "Telegram",
+    "whatsapp": "WhatsApp",
+    "mail": "メール",
+    "notion": "Notion",
+    "obsidian": "Obsidian",
+    "github": "GitHub",
+    "files": "このコンピューターのファイル",
+    "rss": "RSSフィード",
+    "lark": "Lark",
+    "browser": "ブラウザ履歴"
   }
 }
