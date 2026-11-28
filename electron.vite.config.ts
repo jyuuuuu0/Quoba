@@ -19,6 +19,12 @@ function devCsp(): Plugin {
 export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
+    build: {
+      rollupOptions: {
+        // The AutoRAG engine runs in its own utility process, built next to the main entry.
+        input: { index: resolve('src/main/index.ts'), engine: resolve('src/engine/host.ts') }
+      }
+    },
     resolve: {
       alias: { '@shared': resolve('src/shared') }
     }
