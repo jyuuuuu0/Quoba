@@ -27,7 +27,7 @@ let librarianPromise: Promise<Librarian> | undefined
 let lite: Lite | undefined
 let settings: Settings | undefined
 let status: EngineStatus = { state: 'starting' }
-let auth: DazziAuth | undefined
+let authPromise: Promise<DazziAuth> | undefined
 const answers = new Map<string, AbortController>()
 
 function librarian(): Promise<Librarian> {
@@ -47,9 +47,15 @@ function setStatus(next: EngineStatus): EngineStatus {
   return status
 }
 
-async function getAuth(): Promise<DazziAuth> {
-  auth ??= await DazziAuth.create((url) => emit({ kind: 'event', event: 'open-url', data: { url } }))
-  return auth
+/** Concurrent callers share one instance, so a cancel reaches the sign-in it targets. */
+function getAuth(): Promise<DazziAuth> {
+  authPromise ??= DazziAuth.create((url) => emit({ kind: 'event', event: 'open-url', data: { url } })).catch(
+    (error: unknown) => {
+      authPromise = undefined
+      throw error
+    }
+  )
+  return authPromise
 }
 
 /** Writes AutoRAG's config from Quoba's settings and rebuilds the model-free runtime. */
