@@ -21,11 +21,31 @@ const NOT_COMMITMENTS = [
   /(しますか|しましょうか|お願いします|誰が)/
 ]
 
+const HANGUL_BASE = 0xac00
+const JONGSEONG_RIEUL = 8
+
+/**
+ * Korean future-intent endings on any verb: 찍을게요, 갈게, 만들게요. The syllable before 게 is 을
+ * or ends in ㄹ, which leaves out adverbs such as 그렇게 or 쉽게. The ending must also close the
+ * clause, which leaves out 길게 이어졌어요 or 알게 됐어요 where 게 is followed by another word.
+ */
+const INTENT_ENDING = /([가-힣])게(요)?(?=\s*(?:$|[.!~…,;()\]ㅋㅎㅠㅜ^]|\p{Extended_Pictographic}))/gu
+
+function hasKoreanIntentEnding(sentence: string): boolean {
+  for (const match of sentence.matchAll(INTENT_ENDING)) {
+    const syllable = match[1]!
+    if (syllable === '을') return true
+    const code = syllable.charCodeAt(0) - HANGUL_BASE
+    if (code >= 0 && code % 28 === JONGSEONG_RIEUL) return true
+  }
+  return false
+}
+
 export function isPromise(text: string): boolean {
   const sentence = text.trim()
   if (sentence.length < 3 || sentence.length > 400) return false
   if (NOT_COMMITMENTS.some((pattern) => pattern.test(sentence))) return false
-  return COMMITMENTS.some((pattern) => pattern.test(sentence))
+  return hasKoreanIntentEnding(sentence) || COMMITMENTS.some((pattern) => pattern.test(sentence))
 }
 
 const WEEKDAYS: [RegExp, number][] = [

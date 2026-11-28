@@ -12,3 +12,5 @@ Thumbs.db
 coverage/
 eval/results/
 *.tsbuildinfo
+eval/data/
+eval/.autorag/

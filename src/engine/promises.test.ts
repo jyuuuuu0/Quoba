@@ -5,6 +5,8 @@ describe('isPromise', () => {
   it.each([
     '발표 자료는 제가 만들게요',
     '참고문헌 정리도 제가 할게요',
+    '시연 영상은 제가 찍을게요',
+    '내일 일찍 갈게',
     '금요일까지 보내드리겠습니다',
     "I'll send the deck tonight",
     'Leave it to me',
@@ -20,10 +22,26 @@ describe('isPromise', () => {
     'Can you send the deck?',
     'Who will book the room?',
     '誰がやりますか',
-    '좋아요'
+    '좋아요',
+    '그렇게 해요',
+    '쉽게 끝났네'
   ])('rejects a question or request: %s', (text) => {
     expect(isPromise(text)).toBe(false)
   })
+
+  it.each(['내일 갈게!', '그건 제가 정리할게 ㅎㅎ', '자료 올릴게요.'])(
+    'accepts a clause-final intent ending: %s',
+    (text) => {
+      expect(isPromise(text)).toBe(true)
+    }
+  )
+
+  it.each(['회의가 길게 이어졌어요', '그 얘기는 나중에 알게 됐어요', '거리가 멀게 느껴져요'])(
+    'rejects ㄹ+게 that is not an intent ending: %s',
+    (text) => {
+      expect(isPromise(text)).toBe(false)
+    }
+  )
 })
 
 describe('extractDue', () => {
