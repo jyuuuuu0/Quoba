@@ -99,6 +99,9 @@ report['Retrieval MRR'] = (reciprocal / answerable.length).toFixed(3)
 report['Search latency (median)'] = `${Math.round(median(latencies))} ms`
 
 // 3) Optional: AI answers through the full librarian agent.
+/** Phrases an answer uses to say the documents do not contain the answer. */
+const NOT_FOUND =
+  /찾지 못|찾을 수 없|확인되지 않|확인할 수 없|정보가 없|내용이 없|언급(?:이|된 내용이) 없|not found|couldn'?t find|could not find|no (?:information|mention|record)|見つかりません|見つけられ/i
 if (process.argv.includes('--answers')) {
   const config = lib.resolveConfig({ flags: {}, env, cwd: home })
   const model = await lib.resolveAgentModel(config, { env, cwd: home })
@@ -116,7 +119,8 @@ if (process.argv.includes('--answers')) {
     const response = await agent.searchDocuments(question.question)
     answerLatencies.push(performance.now() - started)
     if (question.unanswerable) {
-      if (response.results.length === 0) honest += 1
+      // Judge the answer text, not citations: an uncited guess is still a guess.
+      if (NOT_FOUND.test(response.answer)) honest += 1
     } else if (question.answerKeywords.some((keyword) => response.answer.includes(keyword))) {
       correct += 1
     }
